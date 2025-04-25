@@ -1,0 +1,29 @@
+name: Django EC2 Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: EC2 ssh connection and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}  # 연결할 EC2
+          username: ${{ secrets.SSH_USERNAME }}	 # 사용자
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # pem 파일 내용
+          command_timeout: 5m	 #timeout 시간 설정
+          script: |
+		          cd ~/Desktop/TeamProject_BE
+                  
+                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+                
+		          git pull origin main
+		          sudo systemctl restart uwsgi
+		          sudo systemctl reload nginx
