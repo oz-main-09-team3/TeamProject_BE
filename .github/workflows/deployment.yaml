@@ -1,14 +1,15 @@
 name: Django EC2 Deployment
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [ "Django Project CI" ]   # CI 워크플로우 이름과 일치시켜 주세요
+    types: [ completed ]
 
 jobs:
   deploy:
+    # "Django Project CI" 워크플로우가 main/develop 브랜치에서 성공으로 끝나면 자동으로 배포 워크플로우가 실행됨.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: EC2 ssh connection and deploy
         uses: appleboy/ssh-action@master
