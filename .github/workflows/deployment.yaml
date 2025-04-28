@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     # "Django Project CI" 워크플로우가 main/develop 브랜치에서 성공으로 끝나면 자동으로 배포 워크플로우가 실행됨.
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
       - name: EC2 ssh connection and deploy
@@ -19,11 +19,20 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # pem 파일 내용
           command_timeout: 5m	 #timeout 시간 설정
           script: |
-		          cd ~/Desktop/TeamProject_BE
+		          cd ~/TeamProject_BE
+                  pyenv shell gunicorn
                   export DJANGO_SETTINGS_MODULE=config.settings.prod
-                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
-                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+                  
+                  mkdir -p .env
+                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env/prod.env
+                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env/prod.env
+                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env/prod.env
+            
 		          git pull origin main
-		          sudo systemctl restart uwsgi
+                  poetry install --no-interaction --no-ansi
+                  
+                  python manage.py migrate --noinput
+                  python manage.py collectstatic --noinput
+            
+		          sudo systemctl restart gunicorn
 		          sudo systemctl reload nginx
