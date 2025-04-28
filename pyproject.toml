@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "teamproject-be"
+version = "0.1.0"
+description = ""
+authors = ["SWWS97 <parkmon2@naver.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.13"
+django = ">=5.2,<6.0"
+python-dotenv = ">=1.1.0,<2.0.0"
+psycopg2-binary = ">=2.9.10,<3.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

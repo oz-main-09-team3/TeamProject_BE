@@ -1,0 +1,30 @@
+name: Django EC2 Deployment
+
+on:
+  workflow_run:
+    workflows: [ "Django Project CI" ]   # CI 워크플로우 이름과 일치시켜 주세요
+    types: [ completed ]
+
+jobs:
+  deploy:
+    # "Django Project CI" 워크플로우가 main/develop 브랜치에서 성공으로 끝나면 자동으로 배포 워크플로우가 실행됨.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2 ssh connection and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}  # 연결할 EC2
+          username: ${{ secrets.SSH_USERNAME }}	 # 사용자
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # pem 파일 내용
+          command_timeout: 5m	 #timeout 시간 설정
+          script: |
+		          cd ~/Desktop/TeamProject_BE
+                  
+                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+                
+		          git pull origin main
+		          sudo systemctl restart uwsgi
+		          sudo systemctl reload nginx
