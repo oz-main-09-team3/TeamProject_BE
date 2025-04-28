@@ -1,0 +1,19 @@
+# 로컬 웹훅 테스트용
+# .github/workflows/discord-webhook.yml
+name: Notify Discord on Push
+
+on:
+  push:
+    branches:
+      - main  # 또는 푸시 알림 받고 싶은 브랜치
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message to Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \" 새 Push 발생!\n 커밋자: ${{ github.actor }}\n 메시지: ${{ github.event.head_commit.message }}\"}" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
