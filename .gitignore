@@ -1,2 +1,68 @@
 .idea
 .env
+**/__pycache__/
+# Python bytecode 및 캐시 파일
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*$py.class
+
+# 가상환경(venv, poetry 등)
+
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 환경설정 및 민감정보
+*.env
+.env.*
+!.env.example
+
+# Django 기본 DB
+db.sqlite3
+
+# 미디어, 업로드 파일 (운영환경에서는 별도 관리)
+media/
+media/*
+
+# 로그 및 임시파일
+*.log
+*.pot
+*.bak
+
+# 테스트/커버리지/빌드
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+.tox/
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+sdist/
+var/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE/에디터별 설정
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# macOS/Windows 시스템 파일
+.DS_Store
+Thumbs.db
+
+# Jupyter 노트북 체크포인트
+.ipynb_checkpoints
+
+# 기타
+local_settings.py
