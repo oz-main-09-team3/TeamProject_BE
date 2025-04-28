@@ -52,7 +52,7 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
-      - name: Create .env file
+      - name: Create local.env file
         run: |
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
