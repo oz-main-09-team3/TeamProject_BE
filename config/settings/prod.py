@@ -14,6 +14,7 @@ import random
 
 from dotenv import dotenv_values
 
+
 # dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
 ENV = dotenv_values("../.env/prod.env")
 
@@ -33,6 +34,7 @@ SECRET_KEY = ENV.get(
     "DJANGO_SECRET_KEY", "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()?", k=50))
                      )
 
+from config.settings.base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
