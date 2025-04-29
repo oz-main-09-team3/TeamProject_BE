@@ -2,7 +2,7 @@ from .base import *
 
 
 DEBUG = False
-ALLOWED_HOSTS = ['54.180.95.137', 'ec2-54-180-95-137.ap-northeast-2.compute.amazonaws.com']
+ALLOWED_HOSTS = ['43.201.23.196']
 # dotenv_values("../envs/prod.env") 로 실제 DB/SECRET_KEY 읽어오기
 
 
