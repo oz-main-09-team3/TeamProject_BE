@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # own
     'apps.diary.apps.DiaryConfig',
     # 3rd party
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -28,6 +28,7 @@ class Diary(models.Model):
         return f'일기 {self.id}'
 
 class DiaryImage(models.Model):
+    # TODO: image_url → S3 연동 필요
     diary = models.ForeignKey(
         Diary,
         on_delete=models.CASCADE,
