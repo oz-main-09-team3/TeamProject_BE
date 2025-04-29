@@ -26,6 +26,9 @@ jobs:
                   mkdir -p .env
                   echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env/prod.env
                   echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env/prod.env
+                  echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env/prod.env
+                  echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env/prod.env
+                  echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env/prod.env
                   echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env/prod.env
             
 		          git pull origin main

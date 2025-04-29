@@ -23,6 +23,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: localhost
         # postgres에 사용할 port를 지정. 5432 포트로 들어오는 요청을 5432 포트로 포워딩 해줌. (기본값과 동일)
         ports:
           - 5432:5432
