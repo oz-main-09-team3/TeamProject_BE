@@ -49,9 +49,43 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     # 사용자 앱
     "users",
+    # 크로스
+    'corsheaders'
+]
+
+# 프론트엔드 도메인(Origin) 허용
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",           # 개발용
+]
+
+# 인증정보(쿠키 등) 허용 여부
+CORS_ALLOW_CREDENTIALS = True
+
+# (선택) 모든 헤더 허용
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# (선택) 모든 메서드 허용
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -60,6 +94,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
 
 ROOT_URLCONF = "config.urls"
 

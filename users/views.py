@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from .apis import get_or_create_social_user
 from .serializers import OAuthLoginSerializer
 
-
+# 로그인
 class OAuthLoginAPI(APIView):
     def post(self, request):
         serializer = OAuthLoginSerializer(data=request.data)
