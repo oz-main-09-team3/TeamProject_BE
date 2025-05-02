@@ -11,12 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+
 from datetime import timedelta
 from pathlib import Path
-
 from dotenv import load_dotenv
-
 load_dotenv()
+import random
+
+# dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,14 +30,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+# 시크릿 키를 ENV 변수에 저장된 딕셔너리에서 가져온다. 만약 파일에서 시크릇 키가 존재하지 않는다면 50자리의 무작위 문자열을 반환한다.
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = "users.User"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,6 +53,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # REST framework & 인증 관련
     "rest_framework",
     "rest_framework_simplejwt",
@@ -86,6 +96,7 @@ CORS_ALLOW_METHODS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -94,7 +105,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 
 
 ROOT_URLCONF = "config.urls"
@@ -123,6 +133,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
+
         "NAME": os.getenv("POSTGRES_DB"),
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
@@ -130,6 +141,7 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+
 
 
 # Password validation
@@ -154,9 +166,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+
 LANGUAGE_CODE = "ko-Kr"
 
 TIME_ZONE = "Asia/Seoul"
+
 
 USE_I18N = True
 
@@ -172,6 +186,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 
 
 # REST Framework
@@ -219,3 +234,4 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
 }
+===

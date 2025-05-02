@@ -1,8 +1,24 @@
-from dotenv import dotenv_values
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
 from .base import *
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")  # 루트의 .env 로드
 
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
-ENV = dotenv_values("../envs/dev.env")
+
+DATABASES["default"].update(
+    {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB"),  # dev.env에 있는 DB 이름
+        "USER": os.getenv("POSTGRES_USER"),  # dev.env에 있는 해당 DB 유저
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),  # dev.env에 있는 DB 패스워드
+        "HOST": os.getenv("POSTGRES_HOST"),  # dev.env에 있는 DB HOST
+        "PORT": os.getenv("POSTGRES_PORT"),  # dev.env에 있는 DB PORT
+    }
+)

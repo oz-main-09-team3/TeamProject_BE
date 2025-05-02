@@ -6,4 +6,5 @@ from users.views import OAuthLoginAPI
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/users/social_login/", OAuthLoginAPI.as_view(), name="social_login"),
+
 ]
