@@ -12,14 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 import random
-
+from pathlib import Path
 from dotenv import dotenv_values
 
 # dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
-ENV = dotenv_values("../envs/dev.env")
 
-
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # 시크릿 키를 ENV 변수에 저장된 딕셔너리에서 가져온다. 만약 파일에서 시크릇 키가 존재하지 않는다면 50자리의 무작위 문자열을 반환한다.
-SECRET_KEY = ENV.get(
+SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
     "".join(random.choices("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()?", k=50)),
 )
@@ -88,15 +85,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": ENV.get("POSTGRES_DB"),  # local.env에 있는 DB 이름
-        "USER": ENV.get("POSTGRES_USER"),  # local.env에 있는 해당 DB 유저
-        "PASSWORD": ENV.get("POSTGRES_PASSWORD"),  # local.env에 있는 DB 패스워드
-        "HOST": ENV.get("POSTGRES_HOST"),  # local.env에 있는 DB HOST
-        "PORT": ENV.get("POSTGRES_PORT"),  # local.env에 있는 DB PORT
+        "ENGINE":   "django.db.backends.postgresql",
+        "NAME": None,
+        "USER": None,
+        "PASSWORD": None,
+        "HOST": None,
+        "PORT": None,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
