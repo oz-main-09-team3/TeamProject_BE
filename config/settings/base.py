@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 import random
 from pathlib import Path
+
 from dotenv import dotenv_values
 
 # dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
@@ -85,7 +86,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE":   "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": None,
         "USER": None,
         "PASSWORD": None,
