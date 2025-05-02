@@ -14,28 +14,27 @@ jobs:
       - name: EC2 ssh connection and deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}  # 연결할 EC2
-          username: ${{ secrets.SSH_USERNAME }}	 # 사용자
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # pem 파일 내용
-          command_timeout: 5m	 #timeout 시간 설정
-          script: |
-		          cd ~/TeamProject_BE
-                  pyenv shell gunicorn
-                  export DJANGO_SETTINGS_MODULE=config.settings.prod
-                  
-                  mkdir -p .env
-                  echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env/prod.env
-                  echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env/prod.env
-                  echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env/prod.env
-                  echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env/prod.env
-                  echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> .env/prod.env
-                  echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env/prod.env
+          host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
+          username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
+          script: |                            # ← 이 한 줄이 중요합니다
+            cd ~/TeamProject_BE
+            pyenv shell gunicorn
+            export DJANGO_SETTINGS_MODULE=config.settings.prod
             
-		          git pull origin main
-                  poetry install --no-interaction --no-ansi
-                  
-                  python manage.py migrate --noinput
-                  python manage.py collectstatic --noinput
+            mkdir -p .env
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}"     > .env/prod.env
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env/prod.env
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}"         >> .env/prod.env
+            echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}"     >> .env/prod.env
+            echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}"     >> .env/prod.env
+            echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env/prod.env
             
-		          sudo systemctl restart gunicorn
-		          sudo systemctl reload nginx
+            git pull origin main
+            poetry install --no-interaction --no-ansi
+            
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+            
+            sudo systemctl restart gunicorn
+            sudo systemctl reload nginx
