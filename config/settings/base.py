@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "emotion",
     # 3rd party
     "rest_framework",
+    "apps.diary.apps.DiaryConfig",
     "drf_yasg",
 ]
 
