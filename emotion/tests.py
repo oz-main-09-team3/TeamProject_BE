@@ -77,7 +77,7 @@ class EmotionAPIViewTestCase(TestCase):
 
         emotion_ids = [self.emotion1.id, self.emotion2.id]
         for item in response.data:
-            self.assertIn(item["emotion"], emotion_ids)
+            self.assertIn(item["emotion"]["id"], emotion_ids)
             self.assertIn("count", item)
 
     def test_missing_query_params(self):
