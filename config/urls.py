@@ -16,8 +16,9 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
+from apps import diary
 from users.views import OAuthLoginView
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
     path(
         "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
     ),
+    path("api/diary/", include("apps.diary.urls")),
 ]
