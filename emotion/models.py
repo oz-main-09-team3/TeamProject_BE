@@ -6,7 +6,7 @@ class Emotion(models.Model):
     emotion = models.CharField(max_length=10, verbose_name="감정")
 
     def __str__(self):
-        return f'{self.emoji} - {self.emotion}'
+        return f"{self.emoji} - {self.emotion}"
 
 
 class EmotionData(models.Model):
