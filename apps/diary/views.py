@@ -249,10 +249,3 @@ class LikeDeleteView(APIView):
                 {"message": "존재하지 않는 좋아요입니다"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
-
-class EmotionListView(APIView):
-    def get(self, request):
-        emotions = Emotion.objects.all()
-        serializer = EmotionSerializer(emotions, many=True)
-        return Response(serializer.data)
