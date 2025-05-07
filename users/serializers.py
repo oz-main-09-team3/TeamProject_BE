@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             "phone_num",
             "created_at",
         ]
-        read_only_fields = ["user_id", "created_at"]
+        read_only_fields = ["id", "created_at"]
 
 
 class OAuthLoginSerializer(serializers.Serializer):

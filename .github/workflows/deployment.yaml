@@ -11,17 +11,18 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
-      - name: EC2 ssh connection and deploy
-        uses: appleboy/ssh-action@master
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@master   # master 대신 버전 명시
         with:
           host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
           username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
-          script: |                            # ← 이 한 줄이 중요합니다
+          shell: bash -lc
+          script: |                            # ← 중요: | 이후 줄들은 모두 들여쓰기되어야 함
             cd ~/TeamProject_BE
             pyenv shell gunicorn
             export DJANGO_SETTINGS_MODULE=config.settings.prod
-            
+
             mkdir -p .env
             echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}"     > .env/prod.env
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env/prod.env
@@ -29,12 +30,12 @@ jobs:
             echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}"     >> .env/prod.env
             echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}"     >> .env/prod.env
             echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env/prod.env
-            
+
             git pull origin main
             poetry install --no-interaction --no-ansi
-            
+
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
-            
+
             sudo systemctl restart gunicorn
             sudo systemctl reload nginx
