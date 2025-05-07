@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: EC2 ssh connection and deploy
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@master   # master 대신 버전 명시
         with:
           host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
           username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
