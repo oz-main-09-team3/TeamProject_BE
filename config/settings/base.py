@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.diary.apps.DiaryConfig",
     "drf_yasg",
+    "qrcode",
 ]
 
 MIDDLEWARE = [
