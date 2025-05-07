@@ -20,6 +20,7 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from apps import diary
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -33,6 +34,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/diary/", include("apps.diary.urls")),
     path("api/", include("emotion.urls")),
     # Swagger UI
     path(
