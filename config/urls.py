@@ -22,6 +22,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from apps import diary
+from users.views import OAuthLoginView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,6 +38,9 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("emotion.urls")),
+    path(
+        "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
+    ),
     path("api/diary/", include("apps.diary.urls")),
     path("api/qrcode/", include("qr.urls")),
     # Swagger UI

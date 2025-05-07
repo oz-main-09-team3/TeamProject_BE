@@ -36,6 +36,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "users.User"
 
 # Application definition
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     # own
     "emotion",
     "qr",
+    "users",
     # 3rd party
     "rest_framework",
     "apps.diary.apps.DiaryConfig",
@@ -139,3 +141,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+KAKAO_CLIENT_ID = os.getenv("KAKAO_CLIENT_ID")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
+NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
