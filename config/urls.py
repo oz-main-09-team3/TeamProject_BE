@@ -18,6 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from users.views import OAuthLoginView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
+    ),
 ]

@@ -7,11 +7,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            "user_id",
+            "id",
             "username",
             "nickname",
             "birthday",
-            "profile_img",
+            "profile",
             "phone_num",
             "created_at",
         ]
@@ -19,5 +19,4 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class OAuthLoginSerializer(serializers.Serializer):
-    provider = serializers.ChoiceField(choices=["kakao", "google", "naver"])
-    access_token = serializers.CharField()
+    code = serializers.CharField()

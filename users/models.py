@@ -3,7 +3,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-
     birthday = models.DateField(null=True, blank=True)
     nickname = models.CharField(max_length=100, null=True, blank=True)
     profile = models.ImageField(upload_to="profiles/", null=True, blank=True)
@@ -15,7 +14,7 @@ class User(AbstractUser):
 
 
 class SocialAccount(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     provider = models.CharField(max_length=20)  # kakao, google, naver
     provider_user_id = models.CharField(max_length=100)
 
