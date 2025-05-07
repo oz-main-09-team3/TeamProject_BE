@@ -1,15 +1,8 @@
 from django.urls import path
 
-from apps.diary.views import (
-    CommentDeleteView,
-    CommentView,
-    DiaryByDateView,
-    DiaryCalendarView,
-    DiaryImageView,
-    DiaryView,
-    EmotionListView,
-    LikeDeleteView,
-)
+from apps.diary.views import (CommentDeleteView, CommentView, DiaryByDateView,
+                              DiaryCalendarView, DiaryImageView, DiaryView,
+                              EmotionListView, LikeDeleteView)
 
 urlpatterns = [
     path("", DiaryView.as_view()),
