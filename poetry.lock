@@ -300,6 +300,17 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-qrcode"
+version = "0.3"
+description = "Django application that provides simple templatetags to generate QR-codes"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django-qrcode-0.3.tar.gz", hash = "sha256:88598af03087859c30b83ecd345dd3e988d739f13543e0bef9274eda18d55e0c"},
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.16.0"
 description = "Web APIs for Django, made easy."
@@ -895,4 +906,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "32c5cf08ec5bd334936cdd016d01c9ba9f32990b6dd32852b4a8b0fe10a10b24"
+content-hash = "76662ffa30df45d04f63566cbb8ee0657a65ae1efcfa85fe77763a8e0fa4447f"
