@@ -19,8 +19,12 @@ from django.contrib import admin
 from django.urls import include, path
 
 from apps import diary
+from users.views import OAuthLoginView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
+    ),
     path("api/diary/", include("apps.diary.urls")),
 ]
