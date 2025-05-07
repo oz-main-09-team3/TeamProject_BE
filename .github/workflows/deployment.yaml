@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
           shell: bash -lc
-          script: |                            # ← 중요: | 이후 줄들은 모두 들여쓰기되어야 함
+          script: |                            # ← 중요: | 이후 줄들은 모두 들여쓰기되어야 한다.
             cd ~/TeamProject_BE
             pyenv shell gunicorn
             export DJANGO_SETTINGS_MODULE=config.settings.prod
