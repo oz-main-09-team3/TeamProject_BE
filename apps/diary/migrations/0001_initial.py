@@ -8,35 +8,87 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Diary',
+            name="Diary",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(verbose_name='일기 내용')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='생성 일자')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='수정 일자')),
-                ('visibility', models.BooleanField(default=False, verbose_name='공게/비공개')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField(verbose_name="일기 내용")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="생성 일자"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="수정 일자"),
+                ),
+                (
+                    "visibility",
+                    models.BooleanField(default=False, verbose_name="공게/비공개"),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DiaryImage',
+            name="DiaryImage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image_url', models.CharField(max_length=255, verbose_name='Image URL')),
-                ('diary', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='diary.diary', verbose_name='Diary ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "image_url",
+                    models.CharField(max_length=255, verbose_name="Image URL"),
+                ),
+                (
+                    "diary",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="diary.diary",
+                        verbose_name="Diary ID",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Emotion',
+            name="Emotion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('emoji', models.CharField(max_length=255, verbose_name='감자 이모지 url')),
-                ('emotion', models.CharField(max_length=10, verbose_name='감정')),
-                ('diary', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='diary.diary', verbose_name='Diary ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "emoji",
+                    models.CharField(max_length=255, verbose_name="감자 이모지 url"),
+                ),
+                ("emotion", models.CharField(max_length=10, verbose_name="감정")),
+                (
+                    "diary",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="diary.diary",
+                        verbose_name="Diary ID",
+                    ),
+                ),
             ],
         ),
     ]

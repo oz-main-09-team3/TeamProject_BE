@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from apps.diary.models import Diary, DiaryImage, Emotion
+
 # from apps.user.models import User
 
 # class UserSerializer(serializers.ModelSerializer):
@@ -9,23 +10,27 @@ from apps.diary.models import Diary, DiaryImage, Emotion
 #         model = User
 #         fields = ['id', 'username', 'nickname', 'profile_image']
 
+
 class DiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
-        fields = ['id', 'content', 'created_at', 'updated_at', 'visibility']
+        fields = ["id", "content", "created_at", "updated_at", "visibility"]
+
 
 class DiaryImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiaryImage
-        fields = ['id', 'image_url']
+        fields = ["id", "image_url"]
+
 
 class EmotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Emotion
-        fields = ['id', 'emoji', 'emotion']
+        fields = ["id", "emoji", "emotion"]
+
 
 class DiaryDetailSerializer(serializers.ModelSerializer):
-    images = DiaryImageSerializer(source='images', many=True, read_only=True)
+    images = DiaryImageSerializer(source="images", many=True, read_only=True)
     emotion = serializers.SerializerMethodField()
     # user = UserSerializer(read_only=True)
     like_count = serializers.SerializerMethodField()
@@ -33,10 +38,21 @@ class DiaryDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Diary
-        fields = ['id', 'user', 'content', 'visibility', 'created_at', 'updated_at', 'images', 'emotion', 'comments', 'like_count']
+        fields = [
+            "id",
+            "user",
+            "content",
+            "visibility",
+            "created_at",
+            "updated_at",
+            "images",
+            "emotion",
+            "comments",
+            "like_count",
+        ]
 
     def get_emotion(self, obj):
-        diary_emotion = getattr(obj, 'emotion', None)
+        diary_emotion = getattr(obj, "emotion", None)
         if diary_emotion:
             return EmotionSerializer(diary_emotion.emotion).data
         return None
@@ -46,8 +62,16 @@ class DiaryDetailSerializer(serializers.ModelSerializer):
 
     def get_comments(self, obj):
         comments = obj.comments.filter(is_deleted=False)
-        return [{'comment_id': c.id, 'user_id': c.user.id, 'content': c.content, 'created_at': c.created_at,
-                 'updated_at': c.updated_at} for c in comments]
+        return [
+            {
+                "comment_id": c.id,
+                "user_id": c.user.id,
+                "content": c.content,
+                "created_at": c.created_at,
+                "updated_at": c.updated_at,
+            }
+            for c in comments
+        ]
 
 
 class CalendarDiarySerializer(serializers.Serializer):
