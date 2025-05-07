@@ -16,8 +16,27 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Emotion API",
+        default_version='v1',
+        description="감정 관련 API 문서입니다.",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include("emotion.urls")),
+
+# Swagger UI
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # Redoc UI (선택)
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
