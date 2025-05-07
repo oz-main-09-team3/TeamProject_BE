@@ -38,6 +38,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("emotion.urls")),
     path("api/diary/", include("apps.diary.urls")),
+    path("api/qrcode/", include("qr.urls")),
     # Swagger UI
     path(
         "swagger/",

@@ -17,6 +17,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
           username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
+          shell: bash -lc
           script: |                            # ← 이 한 줄이 중요합니다
             cd ~/TeamProject_BE
             pyenv shell gunicorn

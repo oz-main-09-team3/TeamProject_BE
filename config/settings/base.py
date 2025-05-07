@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # own
     "emotion",
+    "qr",
     # 3rd party
     "rest_framework",
     "apps.diary.apps.DiaryConfig",
