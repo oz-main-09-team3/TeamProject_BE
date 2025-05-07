@@ -1,42 +1,30 @@
 # apis.py
-from .models import Diary, DiaryImage, Emotion
-from datetime import datetime
+from .models import Diary, DiaryImage, Emotion, DiaryEmotion
+from datetime import datetime, timedelta
 from collections import defaultdict
+from django.utils import timezone
 
 def create_diary(user, data, files):
-    """
-    TODO:
-    - 인증(user) 활성화 (user 파라미터 적용)
-    - 이미지 파일 S3 업로드 연동 (image_url → S3 URL)
-    - 좋아요/댓글 기능 연동 (Diary 모델 확장 필요)
-    """
-    # Diary 생성
     content = data.get('content')
     visibility = data.get('visibility', False)
     diary = Diary.objects.create(
-        # user=user, # 나중에 활성화
+        user=user,
         content=content,
         visibility=visibility,
     )
 
-    # 이미지 저장
     images = files.getlist('images') if hasattr(files, 'getlist') else []
-
     for img in images:
         DiaryImage.objects.create(
             diary=diary,
-            image_url=img.name,  # 나중에 s3 url로 바꾸기
+            image_url=img.name,  # 추후 S3 URL로 변경
         )
 
-    # 감정 저장
-    emoji = data.get('emoji')
-    emotion = data.get('emotion')
-    if emoji and emotion:
-        Emotion.objects.create(
-            diary=diary,
-            emoji=emoji,
-            emotion=emotion,
-        )
+    emotion_id = data.get('emotion_id')
+    if emotion_id:
+        emotion = Emotion.objects.filter(id=emotion_id).first()
+        if emotion:
+            DiaryEmotion.objects.create(diary=diary, emotion=emotion)
 
     return {'diary_id': diary.id}
 
@@ -51,14 +39,14 @@ def get_diary_list(request):
     search_keyword = request.query_params.get('keyword')
 
     # 기본 쿼리셋
-    diaries = Diary.objects.all()
+    diaries = Diary.objects.filter(is_deleted=False)
 
     # 필터 적용
     if user_id:
         diaries = diaries.filter(user_id=user_id)
 
     if emotion_type:
-        diary_ids = Emotion.objects.filter(emotion=emotion_type).values_list('diary_id', flat=True)
+        diary_ids = DiaryEmotion.objects.filter(emotion__emotion=emotion_type).values_list('diary_id', flat=True)
         diaries = diaries.filter(id__in=diary_ids)
 
     if date_from and date_to:
@@ -100,10 +88,16 @@ def get_calendar_diary_overview(user_id, year, month):
     calendar_data = []
     for date_str, diary_list in diary_by_date.items():
         diary = diary_list[-1]  # 마지막 일기
-        emotion = Emotion.objects.filter(diary=diary).first()
+
+        diary_emotion = getattr(diary, 'emotion', None)
+        if diary_emotion:
+            emotion = diary_emotion.emotion
+        else:
+            emotion = None
+
         calendar_data.append({
             'date': date_str,
-            'emotion': emotion.emotion if emotion else None,
+            'emotion_id': emotion.id if emotion else None,
             'emoji': emotion.emoji if emotion else None,
             'diary_id': diary.id
         })
@@ -123,8 +117,7 @@ def get_diary_by_date(user_id, date):
     try:
         # date는 'YYYY-MM-DD' 형식
         date_obj = datetime.strptime(date, '%Y-%m-%d')
-        next_day = datetime(date_obj.year, date_obj.month, date_obj.day + 1) if date_obj.day < 28 else datetime(
-            date_obj.year, date_obj.month + 1, 1)
+        next_day = date_obj + timedelta(days=1)
 
         diaries = Diary.objects.filter(
             # user_id=user_id,  # 나중에 활성화
@@ -139,28 +132,39 @@ def get_diary_by_date(user_id, date):
 
 # 일기 상세 조회
 def get_diary_detail(diary_id):
-    """
-    TODO:
-    - 좋아요/댓글 정보 추가 (Like, Comment 모델 연동)
-    """
-    ...
     try:
-        diary = Diary.objects.get(id=diary_id)
+        diary = Diary.objects.get(id=diary_id, is_deleted=False)
     except Diary.DoesNotExist:
         return None
-    images = list(DiaryImage.objects.filter(diary=diary).values('image_url'))
-    emotion = Emotion.objects.filter(diary=diary).first()
+
+    images = list(diary.images.filter(is_deleted=False).values('image_url'))
+    diary_emotion = getattr(diary, 'emotion', None)
+    emotion_data = None
+    if diary_emotion:
+        emotion_data = {
+            'emoji': diary_emotion.emotion.emoji,
+            'emotion': diary_emotion.emotion.emotion,
+        }
+
+    comments = diary.comments.filter(is_deleted=False).values('id', 'user_id', 'content', 'created_at', 'updated_at')
+    like_count = diary.likes.filter(is_deleted=False).count()
+
     return {
         'diary_id': diary.id,
+        'user': {
+            'user_id': diary.user.id,
+            'username': diary.user.username,
+            'nickname': getattr(diary.user, 'nickname', ''),
+            'profile_image': getattr(diary.user, 'profile_image', ''),
+        },
         'content': diary.content,
+        'visibility': diary.visibility,
         'created_at': diary.created_at,
         'updated_at': diary.updated_at,
-        'visibility': diary.visibility,
         'images': images,
-        'emotion': {
-            'emoji': emotion.emoji if emotion else None,
-            'emotion': emotion.emotion if emotion else None,
-        }
+        'emotion': emotion_data,
+        'comments': list(comments),
+        'like_count': like_count,
     }
 
 def update_diary(diary_id, data):
@@ -168,12 +172,25 @@ def update_diary(diary_id, data):
         diary = Diary.objects.get(id=diary_id)
     except Diary.DoesNotExist:
         return False
+
+    emotion_id = data.get('emotion_id')
+    if emotion_id:
+        emotion = Emotion.objects.filter(id=emotion_id).first()
+        if emotion:
+            # 기존 감정 삭제 후 새로 연결
+            DiaryEmotion.objects.filter(diary=diary).delete()
+            DiaryEmotion.objects.create(diary=diary, emotion=emotion)
+
     content = data.get('content')
     visibility = data.get('visibility')
+
     if content:
         diary.content = content
+
     if visibility is not None:
         diary.visibility = visibility
+
+    diary.updated_at = timezone.now()
     diary.save()
     return True
 
@@ -182,5 +199,6 @@ def delete_diary(diary_id):
         diary = Diary.objects.get(id=diary_id)
     except Diary.DoesNotExist:
         return False
-    diary.delete()
+    diary.is_deleted = True
+    diary.save()
     return True
