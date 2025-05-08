@@ -20,3 +20,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 class OAuthLoginSerializer(serializers.Serializer):
     code = serializers.CharField()
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "nickname",
+            "birthday",
+            "profile",
+            "phone_num",
+            "created_at",
+        ]
+        read_only_fields = ["id", "username", "created_at"]
