@@ -52,7 +52,9 @@ INSTALLED_APPS = [
     "emotion",
     "qr",
     "users",
+    "notifications",
     # 3rd party
+    "django_extensions",
     "rest_framework",
     "apps.diary.apps.DiaryConfig",
     "drf_yasg",

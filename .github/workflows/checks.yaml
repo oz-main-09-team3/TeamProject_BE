@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DJANGO_SETTINGS_MODULE: config.settings.prod
+      DJANGO_SETTINGS_MODULE: config.settings.dev
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
@@ -52,14 +52,20 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
 
-      - name: Create local.env file
+      - name: Create dev.env file
         run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-          echo "POSTGRES_HOST=localhost"                          >> .env
-          echo "POSTGRES_PORT=5432"                               >> .env
+          mkdir -p envs
+          echo "DJANGO_SETTINGS_MODULE=config.settings.dev" >> envs/dev.env
+          echo "ENV_MODE=dev" >> envs/dev.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> envs/dev.env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> envs/dev.env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> envs/dev.env
+          echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/dev.env
+          echo "POSTGRES_HOST=localhost"                          >> envs/dev.env
+          echo "POSTGRES_PORT=5432"                               >> envs/dev.env
+
+      - name: Wait for PostgreSQL to be ready
+        run: sleep 10
 
       - name: Install Packages & Libraries
         run: |
