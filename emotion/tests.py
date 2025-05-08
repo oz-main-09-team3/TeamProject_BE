@@ -62,7 +62,7 @@ class EmotionAPIViewTestCase(TestCase):
 
     def test_emotion_trend_view(self):
         response = self.client.get(
-            "/api/emotion/trend/", {"from": self.from_date, "to": self.to_date}
+            "/api/emotion/emotion/trend/", {"from": self.from_date, "to": self.to_date}
         )
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.data, list)
@@ -70,7 +70,7 @@ class EmotionAPIViewTestCase(TestCase):
 
     def test_emotion_count_view(self):
         response = self.client.get(
-            "/api/emotion/count/", {"from": self.from_date, "to": self.to_date}
+            "/api/emotion/emotion/count/", {"from": self.from_date, "to": self.to_date}
         )
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.data, list)
@@ -81,8 +81,8 @@ class EmotionAPIViewTestCase(TestCase):
             self.assertIn("count", item)
 
     def test_missing_query_params(self):
-        response = self.client.get("/api/emotion/trend/")
+        response = self.client.get("/api/emotion/emotion/trend/")
         self.assertEqual(response.status_code, 400)
 
-        response = self.client.get("/api/emotion/count/")
+        response = self.client.get("/api/emotion/emotion/count/")
         self.assertEqual(response.status_code, 400)
