@@ -1,11 +1,12 @@
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .apis import OAuth2Client
 from .models import SocialAccount, User
-from .serializers import OAuthLoginSerializer, UserSerializer
+from .serializers import OAuthLoginSerializer, UserMeSerializer, UserSerializer
 
 
 class OAuthLoginView(APIView):
@@ -45,3 +46,28 @@ class OAuthLoginView(APIView):
                 "user": UserSerializer(user).data,
             }
         )
+
+
+class UserMeAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        return Response(UserMeSerializer(request.user).data)
+
+    def patch(self, request):
+        serializer = UserMeSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(UserMeSerializer(request.user).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class LogoutAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        return Response(status=status.HTTP_204_NO_CONTENT)
