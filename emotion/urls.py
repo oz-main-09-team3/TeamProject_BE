@@ -10,7 +10,7 @@ from emotion.apis import (
 router = DefaultRouter()
 router.register(r"", EmotionViewSet, basename="emotions")
 
-urlpatterns = router.urls + [
+urlpatterns = [
     path("trend/", EmotionTrendView.as_view(), name="emotion_trend"),
     path("count/", EmotionCountView.as_view(), name="emotion_count"),
-]
+] + router.urls
