@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "emotion",
     "qr",
     "users",
+    "notifications",
     # 3rd party
     "rest_framework",
     "apps.diary.apps.DiaryConfig",
