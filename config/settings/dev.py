@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from .base import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")  # 루트의 .env 로드
+load_dotenv(BASE_DIR / "envs" / "dev.env")  # 루트의 dev.env 로드
 
 DEBUG = True
 ALLOWED_HOSTS = []

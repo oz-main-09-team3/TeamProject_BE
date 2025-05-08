@@ -7,7 +7,6 @@ from apps.diary.views import (
     DiaryCalendarView,
     DiaryImageView,
     DiaryView,
-    EmotionListView,
     LikeDeleteView,
 )
 
@@ -24,5 +23,4 @@ urlpatterns = [
     ),  # 댓글 삭제
     path("<int:diary_id>/like/", LikeDeleteView.as_view()),  # 좋아요 추가/삭제
     path("<int:diary_id>/images/", DiaryImageView.as_view()),  # 이미지 업로드/조회
-    path("emotions/", EmotionListView.as_view()),  # 감정 목록 조회
 ]
