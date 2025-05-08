@@ -88,8 +88,8 @@ class EmotionCountView(APIView):
         return Response(result)
 
 
-class EmotionListView(APIView):
-    def get(self, request):
-        emotions = Emotion.objects.all()
-        serializer = EmotionSerializer(emotions, many=True)
-        return Response(serializer.data)
+# class EmotionListView(APIView):
+#     def get(self, request):
+#         emotions = Emotion.objects.all()
+#         serializer = EmotionSerializer(emotions, many=True)
+#         return Response(serializer.data)

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from .base import *
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / "envs" / "prod.env")  # 루트의 .env 로드
 
 DEBUG = False
