@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 
-from .models import Diary, DiaryEmotion, DiaryImage, Emotion
+from .models import Comment, CommentLike, Diary, DiaryEmotion, DiaryImage, Emotion, Like
 
 
 def create_diary(user, data, files):
@@ -80,7 +80,8 @@ def get_calendar_diary_overview(user_id, year, month):
         end_date = datetime(year, month + 1, 1)
 
     diaries = Diary.objects.filter(
-        # user_id=user_id, # 나중에 활성화
+        user_id=user_id,
+        is_deleted=False,
         created_at__gte=start_date,
         created_at__lt=end_date,
     ).order_by("created_at")
@@ -123,22 +124,19 @@ def get_calendar_diary_overview(user_id, year, month):
 
 
 # 특정 날짜의 일기 목록 조회
-def get_diary_by_date(user_id, date):
+def get_diary_by_date(user, date):
     try:
-        # date는 'YYYY-MM-DD' 형식
         date_obj = datetime.strptime(date, "%Y-%m-%d")
         next_day = date_obj + timedelta(days=1)
-
-        diaries = Diary.objects.filter(
-            # user_id=user_id,  # 나중에 활성화
-            created_at__gte=date_obj,
-            created_at__lt=next_day,
-        ).order_by("-created_at")
-
-        return diaries
     except ValueError:
-        # 날짜 형식이 잘못된 경우
-        return None
+        return None, "날짜 형식이 잘못되었습니다. YYYY-MM-DD 형식으로 입력해주세요."
+    diaries = Diary.objects.filter(
+        user=user,
+        is_deleted=False,
+        created_at__gte=date_obj,
+        created_at__lt=next_day,
+    ).order_by("-created_at")
+    return diaries, None
 
 
 # 일기 상세 조회
@@ -217,3 +215,89 @@ def delete_diary(diary_id):
     diary.is_deleted = True
     diary.save()
     return True
+
+
+def create_diary_like(diary_id, user):
+    try:
+        diary = Diary.objects.get(id=diary_id)
+        like, created = Like.objects.get_or_create(diary=diary, user=user)
+        return {"success": True}, 201
+    except Diary.DoesNotExist:
+        return {"message": "일기를 찾을 수 없습니다"}, 404
+
+
+def create_comment(user, diary_id, content):
+    try:
+        diary = Diary.objects.get(id=diary_id)
+        comment = Comment.objects.create(diary=diary, user=user, content=content)
+        return {"comment_id": comment.id}, 201
+    except Diary.DoesNotExist:
+        return {"message": "일기를 찾을 수 없습니다"}, 404
+
+
+def delete_comment(user, diary_id, comment_id):
+    try:
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
+        if comment.user != user:
+            return {"message": "권한이 없습니다"}, 403
+        comment.is_deleted = True
+        comment.save()
+        return {"success": True}, 200
+    except Comment.DoesNotExist:
+        return {"message": "존재하지 않는 댓글입니다"}, 404
+
+
+def update_comment(user, diary_id, comment_id, content):
+    try:
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
+        if comment.user != user:
+            return {"message": "권한이 없습니다."}, 403
+        if not content:
+            return {"message": "수정할 내용이 필요합니다."}, 400
+        comment.content = content
+        comment.save()
+        return {"success": True}, 200
+    except Comment.DoesNotExist:
+        return {"message": "존재하지 않는 댓글입니다."}, 404
+
+
+def delete_diary_like(diary_id, user):
+    try:
+        like = Like.objects.get(diary_id=diary_id, user=user, is_deleted=False)
+        like.is_deleted = True
+        like.save()
+        return {"success": True}, 200
+    except Like.DoesNotExist:
+        return {"message": "존재하지 않는 좋아요입니다"}, 404
+
+
+def create_comment_like(diary_id, comment_id, user):
+    try:
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
+        like, created = CommentLike.objects.get_or_create(
+            comment=comment, user=user, is_deleted=False
+        )
+        if not created:
+            return {"error": "이미 좋아요를 눌렀습니다."}, 400
+        return {"success": True}, 201
+    except Comment.DoesNotExist:
+        return {"error": "존재하지 않는 댓글입니다."}, 404
+
+
+def delete_comment_like(diary_id, comment_id, user):
+    try:
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
+        like = CommentLike.objects.get(comment=comment, user=user, is_deleted=False)
+        like.is_deleted = True
+        like.save()
+        return {"success": True}, 200
+    except (Comment.DoesNotExist, CommentLike.DoesNotExist):
+        return {"error": "존재하지 않는 댓글 또는 좋아요입니다."}, 404

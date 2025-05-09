@@ -23,13 +23,14 @@ class OAuthLoginView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        user_id = user_info["id"]
         # 소셜 계정 존재 여부 확인 및 유저 생성
         social_account, created = SocialAccount.objects.get_or_create(
             provider=provider,
-            provider_user_id=user_info["provider_user_id"],
+            provider_user_id=user_id,
             defaults={
                 "user": User.objects.create(
-                    username=f"{provider}_{user_info['provider_user_id']}",
+                    username=f"{provider}_{user_id}",
                     nickname=user_info.get("nickname"),
                     profile=user_info.get("profile_img"),
                 )
