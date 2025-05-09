@@ -80,7 +80,8 @@ def get_calendar_diary_overview(user_id, year, month):
         end_date = datetime(year, month + 1, 1)
 
     diaries = Diary.objects.filter(
-        # user_id=user_id, # 나중에 활성화
+        user_id=user_id,
+        is_deleted=False,
         created_at__gte=start_date,
         created_at__lt=end_date,
     ).order_by("created_at")
@@ -123,22 +124,19 @@ def get_calendar_diary_overview(user_id, year, month):
 
 
 # 특정 날짜의 일기 목록 조회
-def get_diary_by_date(user_id, date):
+def get_diary_by_date(user, date):
     try:
-        # date는 'YYYY-MM-DD' 형식
         date_obj = datetime.strptime(date, "%Y-%m-%d")
         next_day = date_obj + timedelta(days=1)
-
-        diaries = Diary.objects.filter(
-            # user_id=user_id,  # 나중에 활성화
-            created_at__gte=date_obj,
-            created_at__lt=next_day,
-        ).order_by("-created_at")
-
-        return diaries
     except ValueError:
-        # 날짜 형식이 잘못된 경우
-        return None
+        return None, "날짜 형식이 잘못되었습니다. YYYY-MM-DD 형식으로 입력해주세요."
+    diaries = Diary.objects.filter(
+        user=user,
+        is_deleted=False,
+        created_at__gte=date_obj,
+        created_at__lt=next_day,
+    ).order_by("-created_at")
+    return diaries, None
 
 
 # 일기 상세 조회
@@ -219,24 +217,20 @@ def delete_diary(diary_id):
     return True
 
 
-def create_diary_like(diary_id):
+def create_diary_like(diary_id, user):
     try:
         diary = Diary.objects.get(id=diary_id)
-        # user = request.user  # user 구현 시 활성화
         like, created = Like.objects.get_or_create(
             diary=diary,
-            # user=user
+            user=user
         )
         return {"success": True}, 201
     except Diary.DoesNotExist:
         return {"message": "일기를 찾을 수 없습니다"}, 404
 
-def delete_diary_like(diary_id):
+def delete_diary_like(diary_id, user):
     try:
-        like = Like.objects.get(diary_id=diary_id, is_deleted=False)
-        # user = request.user  # user 구현 시 활성화
-        # if like.user != request.user:
-        #     return {"message": "권한이 없습니다"}, 403
+        like = Like.objects.get(diary_id=diary_id, user=user, is_deleted=False)
         like.is_deleted = True
         like.save()
         return {"success": True}, 200
@@ -244,13 +238,12 @@ def delete_diary_like(diary_id):
         return {"message": "존재하지 않는 좋아요입니다"}, 404
 
 
-def create_comment_like(diary_id, comment_id):
+def create_comment_like(diary_id, comment_id, user):
     try:
         comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
-        # user = request.user  # user 구현 시 활성화
         like, created = CommentLike.objects.get_or_create(
             comment=comment,
-            # user=user,
+            user=user,
             is_deleted=False
         )
         if not created:
@@ -260,13 +253,12 @@ def create_comment_like(diary_id, comment_id):
         return {"error": "존재하지 않는 댓글입니다."}, 404
 
 
-def delete_comment_like(diary_id, comment_id):
+def delete_comment_like(diary_id, comment_id, user):
     try:
         comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
-        # user = request.user  # user 구현 시 활성화
         like = CommentLike.objects.get(
             comment=comment,
-            # user=user,
+            user=user,
             is_deleted=False
         )
         like.is_deleted = True

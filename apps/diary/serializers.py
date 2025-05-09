@@ -3,18 +3,18 @@ from rest_framework import serializers
 
 from apps.diary.models import Diary, DiaryImage, Emotion, CommentLike
 
-# from apps.user.models import User
+from users.models import User
 
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'nickname', 'profile_image']
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'nickname', 'profile']
 
 
 class DiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
-        fields = ["id", "content", "created_at", "updated_at", "visibility"]
+        fields = ["id", 'user', "content", "created_at", "updated_at", "visibility"]
 
 
 class DiaryImageSerializer(serializers.ModelSerializer):
@@ -32,7 +32,7 @@ class EmotionSerializer(serializers.ModelSerializer):
 class DiaryDetailSerializer(serializers.ModelSerializer):
     images = DiaryImageSerializer(source="images", many=True, read_only=True)
     emotion = serializers.SerializerMethodField()
-    # user = UserSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
     like_count = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
 
@@ -66,7 +66,7 @@ class DiaryDetailSerializer(serializers.ModelSerializer):
         for c in comments:
             result.append({
                 "comment_id": c.id,
-                "user_id": getattr(c, "user_id", None),
+                "user": UserSerializer(c.user).data,  # user 정보 포함
                 "content": c.content,
                 "created_at": c.created_at,
                 "updated_at": c.updated_at,
@@ -85,4 +85,4 @@ class CalendarDiarySerializer(serializers.Serializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentLike
-        fields = ['id']  # user 추가 시 'user'도 포함
+        fields = ['id']

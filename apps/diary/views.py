@@ -1,11 +1,12 @@
 # views.py
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from .apis import (
     create_diary,
@@ -35,10 +36,9 @@ class DiaryPagination(PageNumberPagination):
 
 
 class DiaryView(APIView):
-    # TODO: 인증(user) 활성화 필요
+    permission_classes = [IsAuthenticated]
     def post(self, request):
-        # user = request.user (인증 구현 시)
-        result = create_diary(None, request.data, request.FILES)
+        result = create_diary(request.user , request.data, request.FILES)
         return Response(result, status=status.HTTP_201_CREATED)
 
     def get(self, request, diary_id=None):
@@ -47,7 +47,7 @@ class DiaryView(APIView):
         if diary_id:
             # 상세 조회
             try:
-                diary = get_diary_detail(diary_id)
+                diary = Diary.objects.filter(id=diary_id, user=request.user, is_deleted=False).first()
                 if not diary:
                     return Response(
                         {"message": "일기를 찾을 수 없습니다"},
@@ -61,7 +61,7 @@ class DiaryView(APIView):
                 )
         else:
             # 목록 조회
-            diaries = get_diary_list(request)
+            diaries = Diary.objects.filter(user=request.user, is_deleted=False)
             paginator = DiaryPagination()
             page = paginator.paginate_queryset(diaries, request)
             serializer = DiarySerializer(page, many=True)
@@ -110,28 +110,20 @@ class DiaryView(APIView):
 
 class DiaryCalendarView(APIView):
     def get(self, request):
-        # user_id = request.user.id (인증 구현 시)
         now = datetime.now()
         year = int(request.query_params.get("year", now.year))
         month = int(request.query_params.get("month", now.month))
 
-        calendar_data = get_calendar_diary_overview(None, year, month)
+        calendar_data = get_calendar_diary_overview(request.user.id, year, month)
         serializer = CalendarDiarySerializer(calendar_data, many=True)
         return Response(serializer.data)
 
 
 class DiaryByDateView(APIView):
     def get(self, request, date):
-        # user_id = request.user.id (인증 구현 시)
-        diaries = get_diary_by_date(None, date)
-
-        if diaries is None:
-            return Response(
-                {
-                    "message": "날짜 형식이 잘못되었습니다. YYYY-MM-DD 형식으로 입력해주세요."
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        diaries, error = get_diary_by_date(request.user, date)
+        if error:
+            return Response({"message": error}, status=400)
 
         serializer = DiarySerializer(diaries, many=True)
 
@@ -162,14 +154,14 @@ class DiaryImageView(APIView):
 
 
 class CommentView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, diary_id):
         try:
             diary = Diary.objects.get(id=diary_id)
-            # [TODO] user=request.user 활성화 필요
             comment = Comment.objects.create(
                 diary=diary,
                 content=request.data.get("content"),
-                # user=request.user
+                user=request.user
             )
             return Response({"comment_id": comment.id}, status=status.HTTP_201_CREATED)
         except Diary.DoesNotExist:
@@ -178,20 +170,18 @@ class CommentView(APIView):
 
 class CommentDeleteView(APIView):
     def delete(self, request, diary_id, comment_id):
+        permission_classes = [IsAuthenticated]
         try:
-            # 1. 삭제 대상 댓글 조회 (is_deleted=False인 것만)
             comment = Comment.objects.get(
                 id=comment_id, diary_id=diary_id, is_deleted=False
             )
 
-            # 2. [TODO] 인증 구현 시 추가: request.user와 comment.user 일치 여부 확인
-            # if comment.user != request.user:
-            #     return Response(
-            #         {"message": "권한이 없습니다"},
-            #         status=status.HTTP_403_FORBIDDEN
-            #     )
+            if comment.user != request.user:
+                return Response(
+                    {"message": "권한이 없습니다"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
-            # 3. 논리 삭제 처리
             comment.is_deleted = True
             comment.save()
 
@@ -216,21 +206,25 @@ class CommentUpdateView(APIView):
 
 
 class LikeView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, diary_id):
-        result, status_code = create_diary_like(diary_id)
+        result, status_code = create_diary_like(diary_id, request.user)
         return Response(result, status=status_code)
 
 class LikeDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self, request, diary_id):
-        result, status_code = delete_diary_like(diary_id)
+        result, status_code = delete_diary_like(diary_id, request.user)
         return Response(result, status=status_code)
 
 
 class CommentLikeView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, diary_id, comment_id):
-        result, status_code = create_comment_like(diary_id, comment_id)
+        result, status_code = create_comment_like(diary_id, comment_id, request.user)
         return Response(result, status=status_code)
 
     def delete(self, request, diary_id, comment_id):
-        result, status_code = delete_comment_like(diary_id, comment_id)
+        permission_classes = [IsAuthenticated]
+        result, status_code = delete_comment_like(diary_id, comment_id, request.user)
         return Response(result, status=status_code)
