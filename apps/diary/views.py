@@ -9,9 +9,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .apis import (
+    create_comment,
     create_comment_like,
     create_diary,
     create_diary_like,
+    delete_comment,
     delete_comment_like,
     delete_diary,
     delete_diary_like,
@@ -19,6 +21,7 @@ from .apis import (
     get_diary_by_date,
     get_diary_detail,
     get_diary_list,
+    update_comment,
     update_diary,
 )
 from .models import Comment, Diary, DiaryEmotion, DiaryImage, Emotion, Like
@@ -161,50 +164,29 @@ class CommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, diary_id):
-        try:
-            diary = Diary.objects.get(id=diary_id)
-            comment = Comment.objects.create(
-                diary=diary, content=request.data.get("content"), user=request.user
-            )
-            return Response({"comment_id": comment.id}, status=status.HTTP_201_CREATED)
-        except Diary.DoesNotExist:
-            return Response({"message": "일기를 찾을 수 없습니다"}, status=404)
+        content = request.data.get("content")
+        result, status_code = create_comment(request.user, diary_id, content)
+        return Response(result, status=status_code)
 
 
 class CommentDeleteView(APIView):
     def delete(self, request, diary_id, comment_id):
         permission_classes = [IsAuthenticated]
-        try:
-            comment = Comment.objects.get(
-                id=comment_id, diary_id=diary_id, is_deleted=False
-            )
 
-            if comment.user != request.user:
-                return Response(
-                    {"message": "권한이 없습니다"}, status=status.HTTP_403_FORBIDDEN
-                )
-
-            comment.is_deleted = True
-            comment.save()
-
-            return Response({"success": True}, status=status.HTTP_200_OK)
-
-        except Comment.DoesNotExist:
-            return Response(
-                {"message": "존재하지 않는 댓글입니다"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        def delete(self, request, diary_id, comment_id):
+            result, status_code = delete_comment(request.user, diary_id, comment_id)
+            return Response(result, status=status_code)
 
 
 class CommentUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def patch(self, request, diary_id, comment_id):
-        try:
-            comment = Comment.objects.get(id=comment_id, diary_id=diary_id)
-            comment.content = request.data.get("content")
-            comment.save()
-            return Response({"success": True})
-        except Comment.DoesNotExist:
-            return Response({"message": "댓글 없음"}, status=404)
+        content = request.data.get("content")
+        result, status_code = update_comment(
+            request.user, diary_id, comment_id, content
+        )
+        return Response(result, status=status_code)
 
 
 class LikeView(APIView):
