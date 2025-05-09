@@ -90,6 +90,19 @@ class Comment(models.Model):
 
     is_deleted = models.BooleanField(default=False)
 
+class CommentLike(models.Model):
+    comment = models.ForeignKey(
+        Comment,
+        on_delete=models.CASCADE,
+        related_name='likes'
+    )
+    # user = models.ForeignKey(
+    # settings.AUTH_USER_MODEL,
+    # on_delete=models.CASCADE
+    # )
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
+
 
 class Like(models.Model):
     diary = models.ForeignKey(

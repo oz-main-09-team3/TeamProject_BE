@@ -15,6 +15,10 @@ from .apis import (
     get_diary_detail,
     get_diary_list,
     update_diary,
+    create_comment_like,
+    delete_comment_like,
+    create_diary_like,
+    delete_diary_like,
 )
 from .models import Comment, Diary, DiaryImage, Emotion, Like
 from .serializers import (
@@ -213,39 +217,20 @@ class CommentUpdateView(APIView):
 
 class LikeView(APIView):
     def post(self, request, diary_id):
-        try:
-            diary = Diary.objects.get(id=diary_id)
-            # [TODO] user=request.user 활성화 필요
-            like, created = Like.objects.get_or_create(
-                diary=diary,
-                # user=request.user
-            )
-            return Response({"success": True}, status=status.HTTP_201_CREATED)
-        except Diary.DoesNotExist:
-            return Response({"message": "일기를 찾을 수 없습니다"}, status=404)
-
+        result, status_code = create_diary_like(diary_id)
+        return Response(result, status=status_code)
 
 class LikeDeleteView(APIView):
     def delete(self, request, diary_id):
-        try:
-            # 1. 삭제 대상 좋아요 조회 (is_deleted=False인 것만)
-            like = Like.objects.get(diary_id=diary_id, is_deleted=False)
+        result, status_code = delete_diary_like(diary_id)
+        return Response(result, status=status_code)
 
-            # 2. [TODO] 인증 구현 시 추가: request.user와 like.user 일치 여부 확인
-            # if like.user != request.user:
-            #     return Response(
-            #         {"message": "권한이 없습니다"},
-            #         status=status.HTTP_403_FORBIDDEN
-            #     )
 
-            # 3. 논리 삭제 처리
-            like.is_deleted = True
-            like.save()
+class CommentLikeView(APIView):
+    def post(self, request, diary_id, comment_id):
+        result, status_code = create_comment_like(diary_id, comment_id)
+        return Response(result, status=status_code)
 
-            return Response({"success": True}, status=status.HTTP_200_OK)
-
-        except Like.DoesNotExist:
-            return Response(
-                {"message": "존재하지 않는 좋아요입니다"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+    def delete(self, request, diary_id, comment_id):
+        result, status_code = delete_comment_like(diary_id, comment_id)
+        return Response(result, status=status_code)

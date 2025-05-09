@@ -8,6 +8,7 @@ from apps.diary.views import (
     DiaryImageView,
     DiaryView,
     LikeDeleteView,
+    CommentLikeView,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     ),  # 댓글 삭제
     path("<int:diary_id>/like/", LikeDeleteView.as_view()),  # 좋아요 추가/삭제
     path("<int:diary_id>/images/", DiaryImageView.as_view()),  # 이미지 업로드/조회
+    path("<int:diary_id>/comments/<int:comment_id>/like/", CommentLikeView.as_view()),  # 댓글 좋아요 추가/삭제
 ]
