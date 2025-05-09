@@ -1,20 +1,20 @@
 # serializers.py
 from rest_framework import serializers
 
-from apps.diary.models import Diary, DiaryImage, Emotion, CommentLike
-
+from apps.diary.models import CommentLike, Diary, DiaryImage, Emotion
 from users.models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'nickname', 'profile']
+        fields = ["id", "username", "nickname", "profile"]
 
 
 class DiarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Diary
-        fields = ["id", 'user', "content", "created_at", "updated_at", "visibility"]
+        fields = ["id", "user", "content", "created_at", "updated_at", "visibility"]
 
 
 class DiaryImageSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class EmotionSerializer(serializers.ModelSerializer):
 
 
 class DiaryDetailSerializer(serializers.ModelSerializer):
-    images = DiaryImageSerializer(source="images", many=True, read_only=True)
+    images = DiaryImageSerializer(many=True, read_only=True)
     emotion = serializers.SerializerMethodField()
     user = UserSerializer(read_only=True)
     like_count = serializers.SerializerMethodField()
@@ -64,14 +64,16 @@ class DiaryDetailSerializer(serializers.ModelSerializer):
         comments = obj.comments.filter(is_deleted=False)
         result = []
         for c in comments:
-            result.append({
-                "comment_id": c.id,
-                "user": UserSerializer(c.user).data,  # user 정보 포함
-                "content": c.content,
-                "created_at": c.created_at,
-                "updated_at": c.updated_at,
-                "like_count": c.likes.filter(is_deleted=False).count(),
-            })
+            result.append(
+                {
+                    "comment_id": c.id,
+                    "user": UserSerializer(c.user).data,  # user 정보 포함
+                    "content": c.content,
+                    "created_at": c.created_at,
+                    "updated_at": c.updated_at,
+                    "like_count": c.likes.filter(is_deleted=False).count(),
+                }
+            )
         return result
 
 
@@ -85,4 +87,4 @@ class CalendarDiarySerializer(serializers.Serializer):
 class CommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentLike
-        fields = ['id']
+        fields = ["id"]

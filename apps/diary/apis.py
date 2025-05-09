@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from django.utils import timezone
 
-from .models import Diary, DiaryEmotion, DiaryImage, Emotion, Comment, CommentLike, Like
+from .models import Comment, CommentLike, Diary, DiaryEmotion, DiaryImage, Emotion, Like
 
 
 def create_diary(user, data, files):
@@ -220,13 +220,11 @@ def delete_diary(diary_id):
 def create_diary_like(diary_id, user):
     try:
         diary = Diary.objects.get(id=diary_id)
-        like, created = Like.objects.get_or_create(
-            diary=diary,
-            user=user
-        )
+        like, created = Like.objects.get_or_create(diary=diary, user=user)
         return {"success": True}, 201
     except Diary.DoesNotExist:
         return {"message": "일기를 찾을 수 없습니다"}, 404
+
 
 def delete_diary_like(diary_id, user):
     try:
@@ -240,11 +238,11 @@ def delete_diary_like(diary_id, user):
 
 def create_comment_like(diary_id, comment_id, user):
     try:
-        comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
         like, created = CommentLike.objects.get_or_create(
-            comment=comment,
-            user=user,
-            is_deleted=False
+            comment=comment, user=user, is_deleted=False
         )
         if not created:
             return {"error": "이미 좋아요를 눌렀습니다."}, 400
@@ -255,12 +253,10 @@ def create_comment_like(diary_id, comment_id, user):
 
 def delete_comment_like(diary_id, comment_id, user):
     try:
-        comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
-        like = CommentLike.objects.get(
-            comment=comment,
-            user=user,
-            is_deleted=False
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
         )
+        like = CommentLike.objects.get(comment=comment, user=user, is_deleted=False)
         like.is_deleted = True
         like.save()
         return {"success": True}, 200

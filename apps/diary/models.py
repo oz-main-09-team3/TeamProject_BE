@@ -1,15 +1,14 @@
 # models.py
-from users.models import User
 from django.conf import settings
 from django.db import models
+
+from users.models import User
 
 
 class Diary(models.Model):
     user = models.ForeignKey(
-        User,
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        verbose_name='User ID',
     )
 
     content = models.TextField(verbose_name="일기 내용")
@@ -77,10 +76,7 @@ class DiaryEmotion(models.Model):
 class Comment(models.Model):
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="comments")
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     content = models.TextField()
 
@@ -90,30 +86,18 @@ class Comment(models.Model):
 
     is_deleted = models.BooleanField(default=False)
 
+
 class CommentLike(models.Model):
-    comment = models.ForeignKey(
-        Comment,
-        on_delete=models.CASCADE,
-        related_name='likes'
-    )
-    user = models.ForeignKey(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE
-    )
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="likes")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
 
 class Like(models.Model):
-    diary = models.ForeignKey(
-        Diary,
-        on_delete=models.CASCADE,
-    )
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="likes")
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

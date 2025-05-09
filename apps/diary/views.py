@@ -4,24 +4,24 @@ from datetime import datetime, timedelta
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 
 from .apis import (
+    create_comment_like,
     create_diary,
+    create_diary_like,
+    delete_comment_like,
     delete_diary,
+    delete_diary_like,
     get_calendar_diary_overview,
     get_diary_by_date,
     get_diary_detail,
     get_diary_list,
     update_diary,
-    create_comment_like,
-    delete_comment_like,
-    create_diary_like,
-    delete_diary_like,
 )
-from .models import Comment, Diary, DiaryImage, Emotion, Like
+from .models import Comment, Diary, DiaryEmotion, DiaryImage, Emotion, Like
 from .serializers import (
     CalendarDiarySerializer,
     DiaryDetailSerializer,
@@ -37,8 +37,9 @@ class DiaryPagination(PageNumberPagination):
 
 class DiaryView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        result = create_diary(request.user , request.data, request.FILES)
+        result = create_diary(request.user, request.data, request.FILES)
         return Response(result, status=status.HTTP_201_CREATED)
 
     def get(self, request, diary_id=None):
@@ -47,7 +48,9 @@ class DiaryView(APIView):
         if diary_id:
             # 상세 조회
             try:
-                diary = Diary.objects.filter(id=diary_id, user=request.user, is_deleted=False).first()
+                diary = Diary.objects.filter(
+                    id=diary_id, user=request.user, is_deleted=False
+                ).first()
                 if not diary:
                     return Response(
                         {"message": "일기를 찾을 수 없습니다"},
@@ -126,13 +129,14 @@ class DiaryByDateView(APIView):
             return Response({"message": error}, status=400)
 
         serializer = DiarySerializer(diaries, many=True)
-
         data = serializer.data
+
         for diary_data in data:
-            emotion_obj = Emotion.objects.filter(diary_id=diary_data["id"]).first()
-            if emotion_obj:
-                emotion_serializer = EmotionSerializer(emotion_obj)
-                diary_data["emotion"] = emotion_serializer.data
+            diary_emotion = DiaryEmotion.objects.filter(
+                diary_id=diary_data["id"]
+            ).first()
+            if diary_emotion:
+                diary_data["emotion"] = EmotionSerializer(diary_emotion.emotion).data
             else:
                 diary_data["emotion"] = None
 
@@ -155,13 +159,12 @@ class DiaryImageView(APIView):
 
 class CommentView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, diary_id):
         try:
             diary = Diary.objects.get(id=diary_id)
             comment = Comment.objects.create(
-                diary=diary,
-                content=request.data.get("content"),
-                user=request.user
+                diary=diary, content=request.data.get("content"), user=request.user
             )
             return Response({"comment_id": comment.id}, status=status.HTTP_201_CREATED)
         except Diary.DoesNotExist:
@@ -178,8 +181,7 @@ class CommentDeleteView(APIView):
 
             if comment.user != request.user:
                 return Response(
-                    {"message": "권한이 없습니다"},
-                    status=status.HTTP_403_FORBIDDEN
+                    {"message": "권한이 없습니다"}, status=status.HTTP_403_FORBIDDEN
                 )
 
             comment.is_deleted = True
@@ -207,12 +209,11 @@ class CommentUpdateView(APIView):
 
 class LikeView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, diary_id):
         result, status_code = create_diary_like(diary_id, request.user)
         return Response(result, status=status_code)
 
-class LikeDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
     def delete(self, request, diary_id):
         result, status_code = delete_diary_like(diary_id, request.user)
         return Response(result, status=status_code)
@@ -220,6 +221,7 @@ class LikeDeleteView(APIView):
 
 class CommentLikeView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request, diary_id, comment_id):
         result, status_code = create_comment_like(diary_id, comment_id, request.user)
         return Response(result, status=status_code)
