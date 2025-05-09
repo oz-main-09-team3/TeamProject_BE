@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from emotion.apis import (
-    EmotionCountView,
+    EmotionStatisticsView,
     EmotionTrendView,
     EmotionViewSet,
 )
@@ -12,5 +12,5 @@ router.register(r"", EmotionViewSet, basename="emotions")
 
 urlpatterns = [
     path("trend/", EmotionTrendView.as_view(), name="emotion_trend"),
-    path("count/", EmotionCountView.as_view(), name="emotion_count"),
+    path("count/", EmotionStatisticsView.as_view(), name="emotion_count"),
 ] + router.urls
