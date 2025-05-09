@@ -22,7 +22,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from apps import diary
-from users.views import OAuthLoginView
+from users.views import LogoutAPIView, OAuthLoginView, UserMeAPIView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -41,6 +41,8 @@ urlpatterns = [
     path(
         "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
     ),
+    path("api/users/me/", UserMeAPIView.as_view(), name="user-me"),
+    path("api/auth/logout/", LogoutAPIView.as_view(), name="logout"),
     path("api/diary/", include("apps.diary.urls")),
     path("api/qrcode/", include("qr.urls")),
     path("api/notifications/", include("notifications.urls")),
