@@ -183,7 +183,9 @@ class CommentUpdateView(APIView):
 
     def patch(self, request, diary_id, comment_id):
         content = request.data.get("content")
-        result, status_code = update_comment(request.user, diary_id, comment_id, content)
+        result, status_code = update_comment(
+            request.user, diary_id, comment_id, content
+        )
         return Response(result, status=status_code)
 
 

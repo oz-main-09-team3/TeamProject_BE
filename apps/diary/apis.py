@@ -229,11 +229,7 @@ def create_diary_like(diary_id, user):
 def create_comment(user, diary_id, content):
     try:
         diary = Diary.objects.get(id=diary_id)
-        comment = Comment.objects.create(
-            diary=diary,
-            user=user,
-            content=content
-        )
+        comment = Comment.objects.create(diary=diary, user=user, content=content)
         return {"comment_id": comment.id}, 201
     except Diary.DoesNotExist:
         return {"message": "일기를 찾을 수 없습니다"}, 404
@@ -241,7 +237,9 @@ def create_comment(user, diary_id, content):
 
 def delete_comment(user, diary_id, comment_id):
     try:
-        comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
         if comment.user != user:
             return {"message": "권한이 없습니다"}, 403
         comment.is_deleted = True
@@ -253,7 +251,9 @@ def delete_comment(user, diary_id, comment_id):
 
 def update_comment(user, diary_id, comment_id, content):
     try:
-        comment = Comment.objects.get(id=comment_id, diary_id=diary_id, is_deleted=False)
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
         if comment.user != user:
             return {"message": "권한이 없습니다."}, 403
         if not content:
