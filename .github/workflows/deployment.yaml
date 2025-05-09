@@ -17,7 +17,6 @@ jobs:
           host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
           username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
-          shell: bash -lc
           script: |                            # ← 중요: | 이후 줄들은 모두 들여쓰기되어야 한다.
             cd ~/TeamProject_BE
             git pull origin main
@@ -32,7 +31,10 @@ jobs:
             echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}"     >> envs/prod.env
             echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}"     >> envs/prod.env
             echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/prod.env
-
+            
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install poetry
             poetry install --no-interaction --no-ansi
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
