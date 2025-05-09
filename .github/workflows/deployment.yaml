@@ -32,6 +32,10 @@ jobs:
             echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}"     >> envs/prod.env
             echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/prod.env
             
+            git reset --hard HEAD
+            git clean -fd
+            git pull origin main
+            
             python3 -m venv venv
             source venv/bin/activate
             pip install poetry
