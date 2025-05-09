@@ -11,8 +11,8 @@ Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    1. Import the include() function: from django.urls.py import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls.py'))
 """
 
 from django.contrib import admin
@@ -22,7 +22,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from apps import diary
-from users.views import OAuthLoginView
+from users.views import LogoutAPIView, OAuthLoginView, UserMeAPIView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,12 +37,15 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("emotion.urls")),
+    path("api/emotion/", include("emotion.urls")),
     path(
         "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
     ),
+    path("api/users/me/", UserMeAPIView.as_view(), name="user-me"),
+    path("api/auth/logout/", LogoutAPIView.as_view(), name="logout"),
     path("api/diary/", include("apps.diary.urls")),
     path("api/qrcode/", include("qr.urls")),
+    path("api/notifications/", include("notifications.urls")),
     # Swagger UI
     path(
         "swagger/",

@@ -24,7 +24,7 @@ class EmotionTestCase(TestCase):
         expected = "http://example.com/emoji.png - happy"
         self.assertEqual(str(self.em), expected)
 
-    def tset_field_max_length(self):
+    def test_field_max_length(self):
         """
         emoji 필드 max_length=255,
         emotion 필드 max_length=10 이 잘 설정됐는지 확인
