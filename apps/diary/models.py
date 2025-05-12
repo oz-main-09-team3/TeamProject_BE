@@ -15,7 +15,7 @@ class Diary(models.Model):
 
     visibility = models.BooleanField(
         default=False,
-        verbose_name="공게/비공개",
+        verbose_name="공개/비공개",
     )
 
     created_at = models.DateTimeField(
