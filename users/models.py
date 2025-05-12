@@ -4,8 +4,8 @@ from django.db import models
 
 class User(AbstractUser):
     birthday = models.DateField(null=True, blank=True)
-    nickname = models.CharField(max_length=100, null=True, blank=True)
-    profile = models.ImageField(upload_to="profiles/", null=True, blank=True)
+    nickname = models.CharField(max_length=255, null=True, blank=True)
+    profile = models.ImageField(max_length=1024, upload_to="profiles/", null=True, blank=True)
     phone_num = models.CharField(max_length=30, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -15,8 +15,8 @@ class User(AbstractUser):
 
 class SocialAccount(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    provider = models.CharField(max_length=20)  # kakao, google, naver
-    provider_user_id = models.CharField(max_length=100)
+    provider = models.CharField(max_length=255)  # kakao, google, naver
+    provider_user_id = models.CharField(max_length=255)
 
     class Meta:
         unique_together = ("provider", "provider_user_id")
