@@ -86,7 +86,7 @@ def get_calendar_diary_overview(user_id, year, month):
         created_at__lt=end_date,
     ).order_by("created_at")
 
-    # 2. 날짜별로 그룹핑 (YYYY-MM-DD)
+    # emotions. 날짜별로 그룹핑 (YYYY-MM-DD)
     diary_by_date = defaultdict(list)
     for diary in diaries:
         date_str = diary.created_at.strftime("%Y-%m-%d")
