@@ -75,8 +75,26 @@ MIDDLEWARE = [
 ]
 
 # 허용할 Origin 명시
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "https://handsomepotato.p-e.kr"]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "OPTIONS",
+    "PUT",
+    "DELETE",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -149,7 +167,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = []
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
