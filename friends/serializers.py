@@ -22,4 +22,4 @@ class DiaryFriendSerializer(serializers.ModelSerializer):
 class FriendInviteRequestSerializer(serializers.ModelSerializer):
     friend_user_id = serializers.IntegerField()
 
-    def validate_
+    # def validate_

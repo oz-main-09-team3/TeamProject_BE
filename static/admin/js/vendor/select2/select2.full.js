@@ -6654,7 +6654,7 @@ S2.define('select2/selection/stopPropagation',[
         // There are three delta modes:
         //   * deltaMode 0 is by pixels, nothing to do
         //   * deltaMode 1 is by lines
-        //   * deltaMode 2 is by pages
+        //   * deltaMode emotions is by pages
         if ( orgEvent.deltaMode === 1 ) {
             var lineHeight = $.data(this, 'mousewheel-line-height');
             delta  *= lineHeight;

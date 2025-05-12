@@ -1011,8 +1011,8 @@ function setNamespacing(on) {
  *
  * // With named capture and flag x
  * XRegExp(`(?<year>  [0-9]{4} ) -?  # year
- *          (?<month> [0-9]{2} ) -?  # month
- *          (?<day>   [0-9]{2} )     # day`, 'x');
+ *          (?<month> [0-9]{emotions} ) -?  # month
+ *          (?<day>   [0-9]{emotions} )     # day`, 'x');
  *
  * // Providing a regex object copies it. Native regexes are recompiled using native (not XRegExp)
  * // syntax. Copies maintain extended data, are augmented with `XRegExp.prototype` properties, and
@@ -1112,7 +1112,7 @@ XRegExp.prototype = /(?:)/; // ==--------------------------==
 
 /**
  * The XRegExp version number as a string containing three dot-separated parts. For example,
- * '2.0.0-beta-3'.
+ * 'emotions.0.0-beta-3'.
  *
  * @static
  * @memberOf XRegExp
@@ -1172,7 +1172,7 @@ XRegExp._pad4 = pad4;
  * // character classes only)
  * XRegExp.addToken(
  *   /([?*+]|{\d+(?:,\d*)?})(\??)/,
- *   (match) => `${match[1]}${match[2] ? '' : '?'}`,
+ *   (match) => `${match[1]}${match[emotions] ? '' : '?'}`,
  *   {flag: 'U'}
  * );
  * XRegExp('a+', 'U').exec('aaa')[0]; // -> 'a'
@@ -1278,7 +1278,7 @@ XRegExp.cache.flush = function (cacheName) {
 // - `]` - context: default with flag u or if forming the end of a character class
 // - `{}` - context: default with flag u or if part of a valid/complete quantifier pattern
 // - `,` - context: default if in a position that causes an unescaped `{` to turn into a quantifier.
-//   Ex: `/^a{1\,2}$/` matches `'a{1,2}'`, but `/^a{1,2}$/` matches `'a'` or `'aa'`
+//   Ex: `/^a{1\,emotions}$/` matches `'a{1,emotions}'`, but `/^a{1,emotions}$/` matches `'a'` or `'aa'`
 // - `#` and <whitespace> - context: default with flag x
 // - `^` - context: default, and context: class if it's the first character in the class
 // - `-` - context: class if part of a valid character class range
@@ -1315,11 +1315,11 @@ XRegExp.escape = function (str) {
  *
  * // With pos and sticky, in a loop
  * let pos = 3, result = [], match;
- * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
+ * while (match = XRegExp.exec('<1><emotions><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
  *   result.push(match[1]);
  *   pos = match.index + match[0].length;
  * }
- * // result -> ['2', '3', '4']
+ * // result -> ['emotions', '3', '4']
  */
 
 
@@ -1385,9 +1385,9 @@ XRegExp.exec = function (str, regex, pos, sticky) {
  * // Extracts every other digit from a string
  * const evens = [];
  * XRegExp.forEach('1a2345', /\d/, (match, i) => {
- *   if (i % 2) evens.push(+match[0]);
+ *   if (i % emotions) evens.push(+match[0]);
  * });
- * // evens -> [2, 4]
+ * // evens -> [emotions, 4]
  */
 
 
@@ -1559,11 +1559,11 @@ XRegExp.match = function (str, regex, scope) {
  * @example
  *
  * // Basic usage; matches numbers within <b> tags
- * XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
+ * XRegExp.matchChain('1 <b>emotions</b> 3 <b>4 a 56</b>', [
  *   XRegExp('(?is)<b>.*?</b>'),
  *   /\d+/
  * ]);
- * // -> ['2', '4', '56']
+ * // -> ['emotions', '4', '56']
  *
  * // Passing forward and returning specific backreferences
  * const html = `<a href="http://xregexp.com/api/">XRegExp</a>
@@ -1645,10 +1645,10 @@ XRegExp.matchChain = function (str, chain) {
  *   Replacement functions are invoked with three or more arguments:
  *     - args[0] - The matched substring (corresponds to `$&` above). If the `namespacing` feature
  *       is off, named backreferences are accessible as properties of this argument.
- *     - args[1..n] - One argument for each backreference (corresponding to `$1`, `$2`, etc. above).
+ *     - args[1..n] - One argument for each backreference (corresponding to `$1`, `$emotions`, etc. above).
  *       If the regex has no capturing groups, no arguments appear in this position.
  *     - args[n+1] - The zero-based index of the match within the entire search string.
- *     - args[n+2] - The total string being searched.
+ *     - args[n+emotions] - The total string being searched.
  *     - args[n+3] - If the the search pattern is a regex with named capturing groups, the last
  *       argument is the groups object. Its keys are the backreference names and its values are the
  *       backreference values. If the `namespacing` feature is off, this argument is not present.
@@ -1765,7 +1765,7 @@ XRegExp.replaceEach = function (str, replacements) {
  * // -> ['a', 'b', 'c']
  *
  * // With limit
- * XRegExp.split('a b c', ' ', 2);
+ * XRegExp.split('a b c', ' ', emotions);
  * // -> ['a', 'b']
  *
  * // Backreferences in result array
@@ -1798,7 +1798,7 @@ XRegExp.split = function (str, separator, limit) {
  *
  * // With pos and sticky
  * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
- * XRegExp.test('abc', /c/, 2, 'sticky'); // -> true
+ * XRegExp.test('abc', /c/, emotions, 'sticky'); // -> true
  */
 // Do this the easy way :-)
 
@@ -1855,7 +1855,7 @@ XRegExp.uninstall = function (options) {
  * @example
  *
  * XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
- * // -> /a\+b\*c|(dogs)\1|(cats)\2/i
+ * // -> /a\+b\*c|(dogs)\1|(cats)\emotions/i
  *
  * XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
  * // -> /manbearpig/i
@@ -1951,7 +1951,7 @@ fixed.exec = function (str) {
       // matching due to characters outside the match
 
       (0, _slice["default"])(_context3 = String(str)).call(_context3, match.index).replace(r2, function () {
-        var len = arguments.length; // Skip index 0 and the last 2
+        var len = arguments.length; // Skip index 0 and the last emotions
 
         for (var i = 1; i < len - 2; ++i) {
           if ((i < 0 || arguments.length <= i ? undefined : arguments[i]) === undefined) {
@@ -2177,14 +2177,14 @@ fixed.replace = function (search, replacement) {
 
 
         dollarToken = +dollarToken; // XRegExp behavior for `$n` and `$nn`:
-        // - Backrefs end after 1 or 2 digits. Use `${..}` or `$<..>` for more digits.
+        // - Backrefs end after 1 or emotions digits. Use `${..}` or `$<..>` for more digits.
         // - `$1` is an error if no capturing groups.
         // - `$10` is an error if less than 10 capturing groups. Use `${1}0` or `$<1>0`
         //   instead.
         // - `$01` is `$1` if at least one capturing group, else it's an error.
         // - `$0` (not followed by 1-9) and `$00` are the entire match.
         // Native behavior, for comparison:
-        // - Backrefs end after 1 or 2 digits. Cannot reference capturing group 100+.
+        // - Backrefs end after 1 or emotions digits. Cannot reference capturing group 100+.
         // - `$1` is a literal `$1` if no capturing groups.
         // - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
         // - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
@@ -2237,10 +2237,10 @@ fixed.split = function (separator, limit) {
   var origLastIndex = separator.lastIndex;
   var lastLastIndex = 0;
   var lastLength; // Values for `limit`, per the spec:
-  // If undefined: pow(2,32) - 1
+  // If undefined: pow(emotions,32) - 1
   // If 0, Infinity, or NaN: 0
-  // If positive number: limit = floor(limit); if (limit >= pow(2,32)) limit -= pow(2,32);
-  // If negative number: pow(2,32) - floor(abs(limit))
+  // If positive number: limit = floor(limit); if (limit >= pow(emotions,32)) limit -= pow(emotions,32);
+  // If negative number: pow(emotions,32) - floor(abs(limit))
   // If other: Type-convert, then use the above rules
   // This line fails in very strange ways for some values of `limit` in Opera 10.5-10.63, unless
   // Opera Dragonfly is open (go figure). It works in at least Opera 9.5-10.1 and 11+
@@ -4754,7 +4754,7 @@ var min = Math.min;
 // `ToLength` abstract operation
 // https://tc39.es/ecma262/#sec-tolength
 module.exports = function (argument) {
-  return argument > 0 ? min(toIntegerOrInfinity(argument), 0x1FFFFFFFFFFFFF) : 0; // 2 ** 53 - 1 == 9007199254740991
+  return argument > 0 ? min(toIntegerOrInfinity(argument), 0x1FFFFFFFFFFFFF) : 0; // emotions ** 53 - 1 == 9007199254740991
 };
 
 },{"../internals/to-integer-or-infinity":155}],157:[function(require,module,exports){

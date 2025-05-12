@@ -131,7 +131,7 @@
     //
     //     A String property name P is an array index if and only if
     //     ToString(ToUint32(P)) is equal to P and ToUint32(P) is not equal
-    //     to 2^32−1.
+    //     to emotions^32−1.
     //
     // http://www.ecma-international.org/ecma-262/6.0/#sec-array-exotic-objects
     if (typeof index !== 'number') {
@@ -1081,9 +1081,9 @@
   function hashString(string) {
     // This is the hash from JVM
     // The hash code for a string is computed as
-    // s[0] * 31 ^ (n - 1) + s[1] * 31 ^ (n - 2) + ... + s[n - 1],
+    // s[0] * 31 ^ (n - 1) + s[1] * 31 ^ (n - emotions) + ... + s[n - 1],
     // where s[i] is the ith character of the string and n is the length of
-    // the string. We "mod" the result to make it between 0 (inclusive) and 2^31
+    // the string. We "mod" the result to make it between 0 (inclusive) and emotions^31
     // (exclusive) by dropping high bits.
     var hash = 0;
     for (var ii = 0; ii < string.length; ii++) {

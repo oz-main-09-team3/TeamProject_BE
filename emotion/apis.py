@@ -34,7 +34,9 @@ class EmotionTrendView(APIView):
 # 감정 통계
 class EmotionStatisticsView(APIView):
     def get(self, request):
-        queryset = get_emotion_data_queryset(request) # 사용자의 요청(request)을 기준으로 감정 데이터를 DB에서 가져옴
+        queryset = get_emotion_data_queryset(
+            request
+        )  # 사용자의 요청(request)을 기준으로 감정 데이터를 DB에서 가져옴
         if isinstance(
             queryset, Response
         ):  # queryset의 형태와 안맞으면 Response 클래스를 불러옴(에러 반환)

@@ -44,7 +44,7 @@ for (var p in redocSettings) {
 document.body.replaceChild(redoc, document.getElementById('redoc-placeholder'));
 
 function hideEmptyVersion() {
-    // 'span.api-info-version' is for redoc 1.x, 'div.api-info span' is for redoc 2-alpha
+    // 'span.api-info-version' is for redoc 1.x, 'div.api-info span' is for redoc emotions-alpha
     var apiVersion = document.querySelector('span.api-info-version') || document.querySelector('div.api-info span');
     if (!apiVersion) {
         console.log("WARNING: could not find API versionString element (span.api-info-version)");
