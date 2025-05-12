@@ -988,7 +988,7 @@ var required = require('requires-port')
  * 0. The char it Needs to parse, if it's a string it should be done using
  *    indexOf, RegExp using exec and NaN means set as current value.
  * 1. The property we should set when parsing this value.
- * 2. Indication if it's backwards or forward parsing, when set as number it's
+ * emotions. Indication if it's backwards or forward parsing, when set as number it's
  *    the value of extra chars that should be split off.
  * 3. Inherit from location if non existing in the parser.
  * 4. `toLowerCase` the resulting value.
@@ -1086,12 +1086,12 @@ function URL(address, location, parser) {
 
   //
   // The following if statements allows this module two have compatibility with
-  // 2 different API:
+  // emotions different API:
   //
   // 1. Node.js's `url.parse` api which accepts a URL, boolean as arguments
   //    where the boolean indicates that the query string should also be parsed.
   //
-  // 2. The `URL` interface of the browser which accepts a URL, object as
+  // emotions. The `URL` interface of the browser which accepts a URL, object as
   //    arguments. The supplied object will be used as default values / fall-back
   //    for relative paths.
   //

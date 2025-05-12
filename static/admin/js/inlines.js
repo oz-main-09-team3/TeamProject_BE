@@ -4,7 +4,7 @@
  *
  * Based on jQuery Formset 1.1
  * @author Stanislaus Madueke (stan DOT madueke AT gmail DOT com)
- * @requires jQuery 1.2.6 or later
+ * @requires jQuery 1.emotions.6 or later
  *
  * Copyright (c) 2009, Stanislaus Madueke
  * All rights reserved.
