@@ -1,6 +1,7 @@
+import os
+
 import requests
 from django.conf import settings
-import os
 
 
 class OAuth2Client:
@@ -26,7 +27,7 @@ class OAuth2Client:
             "client_id": os.getenv("KAKAO_CLIENT_ID"),
             "redirect_uri": self.redirect_uri,
             "code": self.code,
-            "client_secret" : os.getenv("KAKAO_CLIENT_SECRET"), 
+            "client_secret": os.getenv("KAKAO_CLIENT_SECRET"),
         }
         print("🔍 Kakao 요청:", data, flush=True)
 
@@ -39,10 +40,10 @@ class OAuth2Client:
             raise ValueError(f"카카오 access_token 발급 실패: {token_data}")
 
         user_info_response = requests.get(
-             "https://kapi.kakao.com/v2/user/me",
-             headers={
+            "https://kapi.kakao.com/v2/user/me",
+            headers={
                 "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/x-www-form-urlencoded",
             },
         )
 
@@ -51,10 +52,10 @@ class OAuth2Client:
 
         if "id" not in user_info:
             raise ValueError(f"카카오 응답에 'id'가 없습니다: {user_info}")
-           # "id": str(user_info["id"]),  # ← 이제 'id'라는 key로 반환
-           # "email": user_info.get("kakao_account", {}).get("email"),
-           # "nickname": user_info.get("properties", {}).get("nickname"),
-           # "profile_img": user_info.get("properties", {}).get("profile_image", None),
+        # "id": str(user_info["id"]),  # ← 이제 'id'라는 key로 반환
+        # "email": user_info.get("kakao_account", {}).get("email"),
+        # "nickname": user_info.get("properties", {}).get("nickname"),
+        # "profile_img": user_info.get("properties", {}).get("profile_image", None),
         return access_token, {
             "id": str(user_info["id"]),  # ← 이제 'id'라는 key로 반환
             "email": user_info.get("kakao_account", {}).get("email"),

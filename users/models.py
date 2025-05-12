@@ -5,7 +5,9 @@ from django.db import models
 class User(AbstractUser):
     birthday = models.DateField(null=True, blank=True)
     nickname = models.CharField(max_length=255, null=True, blank=True)
-    profile = models.ImageField(max_length=1024, upload_to="profiles/", null=True, blank=True)
+    profile = models.ImageField(
+        max_length=1024, upload_to="profiles/", null=True, blank=True
+    )
     phone_num = models.CharField(max_length=30, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
