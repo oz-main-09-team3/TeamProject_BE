@@ -2,8 +2,8 @@ name: Django EC2 Deployment
 
 on:
   workflow_run:
-    workflows: ["Django Project CI"]
-    types: [completed]
+    workflows: [ "Django Project CI" ]   # CI 워크플로우 이름과 일치시켜 주세요
+    types: [ completed ]
 
 jobs:
   deploy:
