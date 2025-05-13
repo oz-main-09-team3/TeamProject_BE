@@ -1,6 +1,7 @@
 from rest_framework.exceptions import NotFound
-from users.models import User
+
 from friendlist.models import FriendList
+from users.models import User
 
 
 def get_friend_list(user):

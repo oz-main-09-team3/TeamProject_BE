@@ -2,8 +2,9 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .apis import get_friend_list, delete_friend
+from .apis import delete_friend, get_friend_list
 from .serializers import FriendListSerializer
+
 
 class FriendListAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -12,6 +13,7 @@ class FriendListAPIView(APIView):
         friends = get_friend_list(request.user)
         serializer = FriendListSerializer(friends, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class FriendDeleteAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
