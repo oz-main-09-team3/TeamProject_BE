@@ -75,6 +75,10 @@ MIDDLEWARE = [
 ]
 
 # 허용할 Origin 명시
+CORS_ALLOWED_ORIGINS = [
+    "https://fancypotato.netlify.app",
+    "http://localhost:5173",
+]
 CSRF_TRUSTED_ORIGINS = ["http://localhost:5173", "https://handsomepotato.p-e.kr"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
@@ -83,6 +87,7 @@ CORS_ALLOW_METHODS = [
     "OPTIONS",
     "PUT",
     "DELETE",
+    "PATCH",
 ]
 
 CORS_ALLOW_HEADERS = [

@@ -24,7 +24,7 @@ from users.views import LogoutAPIView, OAuthLoginView, UserMeAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/emotion/", include("emotion.urls")),
+    path("api/emotions/", include("emotion.urls")),
     path(
         "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
     ),
