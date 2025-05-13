@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "qrcode",
     "corsheaders",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -171,13 +172,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # 배포용이면 사용
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
