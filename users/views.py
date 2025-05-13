@@ -36,7 +36,7 @@ class OAuthLoginView(APIView):
                     defaults={
                         "nickname": user_info.get("nickname", ""),
                         "profile": user_info.get("profile_img", None),
-                    }
+                    },
                 )
             except IntegrityError:
                 user = User.objects.get(username=username)
