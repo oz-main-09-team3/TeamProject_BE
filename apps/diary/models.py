@@ -34,16 +34,16 @@ class Diary(models.Model):
 
 
 class DiaryImage(models.Model):
-    # TODO: image_url → S3 연동 필요
     diary = models.ForeignKey(
-        Diary, on_delete=models.CASCADE, verbose_name="Diary ID", related_name="images"
+        Diary,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name="Diary ID"
     )
-
-    image_url = models.CharField(
-        max_length=255,
-        verbose_name="Image URL",
+    image = models.FileField(
+        upload_to='diary_images/',  # S3 경로 지정
+        verbose_name="Image File"
     )
-
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):

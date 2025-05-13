@@ -20,7 +20,7 @@ def create_diary(user, data, files):
     for img in images:
         DiaryImage.objects.create(
             diary=diary,
-            image_url=img.name,  # 추후 S3 URL로 변경
+            image=img  # FileField에 파일 객체 직접 저장
         )
 
     emotion_id = data.get("emotion_id")

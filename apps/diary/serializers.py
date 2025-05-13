@@ -18,9 +18,14 @@ class DiarySerializer(serializers.ModelSerializer):
 
 
 class DiaryImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = DiaryImage
-        fields = ["id", "image_url"]
+        fields = ['id', 'image_url']
+
+    def get_image_url(self, obj):
+        return obj.image.url  # S3 URL 자동 생성
 
 
 class EmotionSerializer(serializers.ModelSerializer):
