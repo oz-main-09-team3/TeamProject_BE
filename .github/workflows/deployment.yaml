@@ -1,4 +1,4 @@
-yaml name: Django EC2 Deployment
+name: Django EC2 Deployment
 
 on:
   workflow_run:
