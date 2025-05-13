@@ -5,7 +5,7 @@ class Emotion(models.Model):
     emoji = models.CharField(
         max_length=255,
         verbose_name="감자 이모지 url",
-        help_text="예: /static/emotions/1.png",
+        help_text="예: 1.png",
     )
     emotion = models.CharField(max_length=10, verbose_name="감정", blank=True)
 

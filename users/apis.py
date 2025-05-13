@@ -63,44 +63,77 @@ class OAuth2Client:
             "profile_img": user_info.get("properties", {}).get("profile_image"),
         }
 
-    def _google(self):
-        token_url = "https://oauth2.googleapis.com/token"
-        data = {
-            "grant_type": "authorization_code",
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "client_secret": settings.GOOGLE_CLIENT_SECRET,
-            "redirect_uri": self.redirect_uri,
-            "code": self.code,
-        }
-        access_token = requests.post(token_url, data=data).json().get("access_token")
-        user_info = requests.get(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
-            headers={"Authorization": f"Bearer {access_token}"},
-        ).json()
-        return access_token, {
-            "provider_user_id": user_info["id"],
-            "email": user_info.get("email"),
-            "nickname": user_info.get("name"),
-            "profile": user_info.get("picture"),
-        }
-
     def _naver(self):
         token_url = "https://nid.naver.com/oauth2.0/token"
         data = {
             "grant_type": "authorization_code",
-            "client_id": settings.NAVER_CLIENT_ID,
-            "client_secret": settings.NAVER_CLIENT_SECRET,
+            "client_id": os.getenv("NAVER_CLIENT_ID"),
+            "client_secret": os.getenv("NAVER_CLIENT_SECRET"),
             "code": self.code,
             "state": self.state,
         }
-        access_token = requests.post(token_url, data=data).json().get("access_token")
-        user_info = requests.get(
+        print("🔍 Naver 요청:", data, flush=True)
+
+        token_response = requests.post(token_url, data=data)
+        token_data = token_response.json()
+        print("🔐 Naver 응답:", token_data, flush=True)
+
+        access_token = token_data.get("access_token")
+        if not access_token:
+            raise ValueError(f"네이버 access_token 발급 실패: {token_data}")
+
+        user_info_response = requests.get(
             "https://openapi.naver.com/v1/nid/me",
             headers={"Authorization": f"Bearer {access_token}"},
-        ).json()["response"]
+        )
+
+        user_info_data = user_info_response.json()
+        print("👤 Naver 사용자 정보:", user_info_data, flush=True)
+
+        user_info = user_info_data.get("response")
+        if not user_info or "id" not in user_info:
+            raise ValueError(f"네이버 응답에 'id'가 없습니다: {user_info_data}")
+
         return access_token, {
-            "provider_user_id": user_info["id"],
+            "id": user_info["id"],
             "email": user_info.get("email"),
             "nickname": user_info.get("nickname"),
-            "profile": user_info.get("profile_image"),
+            "profile_img": user_info.get("profile_image"),
+        }
+
+    def _google(self):
+        token_url = "https://oauth2.googleapis.com/token"
+        data = {
+            "grant_type": "authorization_code",
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "code": self.code,
+            "redirect_uri": self.redirect_uri,
+        }
+        print("🔍 Google 요청:", data, flush=True)
+
+        token_response = requests.post(token_url, data=data)
+        token_data = token_response.json()
+        print("🔐 Google 응답:", token_data, flush=True)
+
+        access_token = token_data.get("access_token")
+        if not access_token:
+            raise ValueError(f"구글 access_token 발급 실패: {token_data}")
+
+        user_info_response = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        user_info = user_info_response.json()
+        print("👤 Google 사용자 정보:", user_info, flush=True)
+
+        if "id" not in user_info:
+            raise ValueError(f"구글 응답에 'id'가 없습니다: {user_info}")
+
+        return access_token, {
+            "id": user_info["id"],
+            "email": user_info.get("email"),
+            "nickname": user_info.get("name"),  # 이름 또는 전체 이름
+            "profile_img": user_info.get("picture"),
         }

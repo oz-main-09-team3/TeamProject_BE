@@ -1,5 +1,6 @@
 import os
 
+from django.db import IntegrityError
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
@@ -22,11 +23,18 @@ class OAuthLoginView(APIView):
         try:
             oauth_client = OAuth2Client(provider, code, redirect_uri)
             access_token, user_info = oauth_client.get_token_and_user_info()
-            user, _ = User.objects.get_or_create(
-                username=f"{provider}{user_info['id']}",
-                nickname=user_info.get("nickname", ""),
-                profile=user_info.get("profile_img", None),
-            )
+
+            try:
+                user, _ = User.objects.get_or_create(
+                    username=f"{provider}{user_info['id']}",
+                    defaults={
+                        "nickname": user_info.get("nickname", ""),
+                        "profile": user_info.get("profile_img", None),
+                    },
+                )
+            except IntegrityError:
+                # 이미 존재하는 경우, 기존 사용자 불러오기
+                user = User.objects.get(username=f"{provider}{user_info['id']}")
 
             social_account, created = SocialAccount.objects.get_or_create(
                 provider=provider,
