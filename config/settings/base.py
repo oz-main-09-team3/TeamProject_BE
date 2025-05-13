@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "qrcode",
     "corsheaders",
+    "storages",
 ]
 
 MIDDLEWARE = [

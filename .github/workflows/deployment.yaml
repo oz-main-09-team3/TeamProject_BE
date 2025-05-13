@@ -2,40 +2,37 @@ name: Django EC2 Deployment
 
 on:
   workflow_run:
-    workflows: [ "Django Project CI" ]   # CI 워크플로우 이름과 일치시켜 주세요
-    types: [ completed ]
+    workflows: ["Django Project CI"]
+    types: [completed]
 
 jobs:
   deploy:
-    # "Django Project CI" 워크플로우가 main/develop 브랜치에서 성공으로 끝나면 자동으로 배포 워크플로우가 실행됨.
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: EC2 ssh connection and deploy
-        uses: appleboy/ssh-action@master   # master 대신 버전 명시
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}        # EC2 호스트/IP
-          username: ${{ secrets.SSH_USERNAME }} # EC2 로그인 사용자
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # PEM 키
-          script: |                            # ← 중요: | 이후 줄들은 모두 들여쓰기되어야 한다.
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             cd ~/TeamProject_BE
             git pull origin main
-            pyenv shell gunicorn
-           
+            
             mkdir -p envs
             echo "DJANGO_SETTINGS_MODULE=config.settings.prod" > envs/prod.env
             echo "ENV_MODE=prod" >> envs/prod.env
-            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}"     >> envs/prod.env
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> envs/prod.env
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> envs/prod.env
-            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}"         >> envs/prod.env
-            echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}"     >> envs/prod.env
-            echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}"     >> envs/prod.env
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> envs/prod.env
+            echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> envs/prod.env
+            echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> envs/prod.env
             echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/prod.env
-            
-#            git reset --hard HEAD
-#            git clean -fd
-#            git pull origin main
-            
+            echo "AWS_STORAGE_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> envs/prod.env
+            echo "AWS_S3_REGION_NAME=ap-northeast-2" >> envs/prod.env  # 또는 사용하는 리전
+
             python3 -m venv venv
             source venv/bin/activate
             pip install poetry
