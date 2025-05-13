@@ -38,7 +38,10 @@ class DiaryImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DiaryImage
-        fields = ["id", "image_url"]
+        fields = ['id', 'image_url']
+
+    def get_image_url(self, obj):
+        return obj.image.url  # S3 URL 자동 생성
 
     def get_image_url(self, obj):
         return obj.image.url  # S3 URL 자동 생성
