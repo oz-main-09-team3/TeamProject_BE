@@ -4,7 +4,7 @@ from users.models import User
 
 
 class FriendList(models.Model):
-    user = models.ForeignKey(User, Related_name="friends", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="friends", on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name="friend_of", on_delete=models.CASCADE)
 
     class Meta:

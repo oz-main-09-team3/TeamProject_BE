@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "qr",
     "users",
     "notifications",
+    "friendlist"
     # 3rd party
     "django_extensions",
     "rest_framework",
