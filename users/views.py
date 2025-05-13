@@ -21,34 +21,38 @@ class OAuthLoginView(APIView):
         redirect_uri = request.data.get("redirect_uri")
 
         try:
+            # 🔐 소셜 access_token 및 사용자 정보 가져오기
             oauth_client = OAuth2Client(provider, code, redirect_uri)
             access_token, user_info = oauth_client.get_token_and_user_info()
 
+            # 📌 username 생성
+            provider_user_id = user_info["id"]
+            username = f"{provider}{provider_user_id}"
+
+            # 👤 유저 생성 또는 가져오기 (중복 시 예외 처리)
             try:
-                user, _ = User.objects.get_or_create(
-                    username=f"{provider}{user_info['id']}",
+                user, created = User.objects.get_or_create(
+                    username=username,
                     defaults={
                         "nickname": user_info.get("nickname", ""),
                         "profile": user_info.get("profile_img", None),
                     },
                 )
             except IntegrityError:
-                # 이미 존재하는 경우, 기존 사용자 불러오기
-                user = User.objects.get(username=f"{provider}{user_info['id']}")
+                user = User.objects.get(username=username)
 
-            social_account, created = SocialAccount.objects.get_or_create(
+            # 🔗 SocialAccount 연결
+            social_account, _ = SocialAccount.objects.get_or_create(
                 provider=provider,
-                provider_user_id=(provider_user_id := user_info["id"]),
+                provider_user_id=provider_user_id,
                 defaults={"user": user},
             )
-            print(
-                f"🔎 provider_user_id 길이: {len(provider_user_id)} / 값: {provider_user_id}",
-                flush=True,
-            )
-            user = social_account.user
 
-            # JWT 발급
+            user = social_account.user  # 혹시라도 연결된 다른 유저가 있다면 보정
+
+            # 🔑 JWT 발급
             refresh = RefreshToken.for_user(user)
+
             return Response(
                 {
                     "token": str(refresh.access_token),
