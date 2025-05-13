@@ -152,14 +152,11 @@ class DiaryImageView(APIView):
     def post(self, request, diary_id):
         try:
             diary = Diary.objects.get(id=diary_id)
-            for img in request.FILES.getlist('images'):
-                DiaryImage.objects.create(
-                    diary=diary,
-                    image=img
-                )
-            return Response({'success': True}, status=201)
+            for img in request.FILES.getlist("images"):
+                DiaryImage.objects.create(diary=diary, image=img)
+            return Response({"success": True}, status=201)
         except Diary.DoesNotExist:
-            return Response({'message': '일기를 찾을 수 없습니다'}, status=404)
+            return Response({"message": "일기를 찾을 수 없습니다"}, status=404)
 
 
 class CommentView(APIView):

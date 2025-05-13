@@ -19,8 +19,7 @@ def create_diary(user, data, files):
     images = files.getlist("images") if hasattr(files, "getlist") else []
     for img in images:
         DiaryImage.objects.create(
-            diary=diary,
-            image=img  # FileField에 파일 객체 직접 저장
+            diary=diary, image=img  # FileField에 파일 객체 직접 저장
         )
 
     emotion_id = data.get("emotion_id")

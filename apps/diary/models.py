@@ -35,14 +35,13 @@ class Diary(models.Model):
 
 class DiaryImage(models.Model):
     diary = models.ForeignKey(
-        Diary,
-        on_delete=models.CASCADE,
-        related_name='images',
-        verbose_name="Diary ID"
+        Diary, on_delete=models.CASCADE, related_name="images", verbose_name="Diary ID"
     )
     image = models.FileField(
-        upload_to='diary_images/',  # S3 경로 지정
-        verbose_name="Image File"
+        upload_to="diary_images/",
+        null=True,
+        blank=True,
+        verbose_name="Image File",  # S3 경로 지정
     )
     is_deleted = models.BooleanField(default=False)
 
