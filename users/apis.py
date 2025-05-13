@@ -76,7 +76,6 @@ class OAuth2Client:
             "profile_img": user_info.get("profile_image"),
         }
 
-
     def _google(self):
         token_url = "https://oauth2.googleapis.com/token"
         data = {
