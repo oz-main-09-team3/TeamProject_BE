@@ -32,6 +32,8 @@ jobs:
             echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/prod.env
             echo "AWS_STORAGE_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> envs/prod.env
             echo "AWS_S3_REGION_NAME=ap-northeast-2" >> envs/prod.env  # 또는 사용하는 리전
+            echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> envs/prod.env
+            echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> envs/prod.env
 
             python3 -m venv venv
             source venv/bin/activate
