@@ -10,13 +10,26 @@ from emotion.models import Emotion, EmotionData
 from emotion.serializers import EmotionSerializer, EmotionTrendViewSerializer
 from emotion.utils import get_emotion_data_queryset
 
+# # ReadOnlyModelViewSet : list(), retriev() 메소드만 자동 지원
+# class EmotionViewSet(ReadOnlyModelViewSet):
+#     queryset = Emotion.objects.all()  # Emotion 모델에 있는 모든 감정 데이터를 불러옴
+#     serializer_class = EmotionSerializer  # EmotionSerializer를 사용해 JSON 형태로 변환
+#     # /api/emotions/로 감정 리스트를 GET 요청하면 EmotionViewSet이 응답
+
 
 # 감정 조회 전용 API
-# ReadOnlyModelViewSet : list(), retriev() 메소드만 자동 지원
-class EmotionViewSet(ReadOnlyModelViewSet):
-    queryset = Emotion.objects.all()  # Emotion 모델에 있는 모든 감정 데이터를 불러옴
-    serializer_class = EmotionSerializer  # EmotionSerializer를 사용해 JSON 형태로 변환
-    # /api/emotions/로 감정 리스트를 GET 요청하면 EmotionViewSet이 응답
+class EmotionListView(APIView):
+    def get(self, request):
+        emotions = Emotion.objects.all()
+        data = [
+            {
+                "id": e.id,
+                "emotion": e.emotion,
+                "image_url": e.image_url,  # 이건 property이므로 /static/emotions/1.png 형태
+            }
+            for e in emotions
+        ]
+        return Response(data)
 
 
 # 감정 변화 그래프
