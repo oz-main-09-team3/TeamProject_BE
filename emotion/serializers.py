@@ -4,10 +4,11 @@ from emotion.models import Emotion, EmotionData
 
 
 class EmotionSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Emotion
-        fields = ["id", "emoji", "emotion"]
-        read_only_fields = ["id"]
+        fields = ["id", "emoji", "emotion", "image_url"]
 
 
 class EmotionTrendViewSerializer(serializers.ModelSerializer):

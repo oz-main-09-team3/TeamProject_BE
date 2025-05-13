@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / "envs" / "prod.env")  # 루트의 .env 로드
 
 DEBUG = False
-ALLOWED_HOSTS = ["43.201.23.196"]
+ALLOWED_HOSTS = ["handsomepotato.p-e.kr"]
 
 
 DATABASES["default"].update(

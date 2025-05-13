@@ -6,15 +6,15 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-class QrCodeView(APIView):
+class QrCodeCreateView(APIView):
     def get(self, request):
-        data = request.query_params.get(
-            "data"
+        user = request.query_params.get(
+            "username"
         )  # 예) /api/qrcode/?data=hello123 -> data="hello123"
-        if not data:  # data 부분이 없으면 오류메시지와 400 Bad Request 응답을 보냄
-            return Response({"detail": "data 파라미터가 필요합니다."}, status=400)
+        if not user:  # data 부분이 없으면 오류메시지와 400 Bad Request 응답을 보냄
+            return Response({"detail": "username 파라미터가 필요합니다."}, status=400)
         # qrcode.make(): 문자열을 QR 코드 이미지로 자동 변환 해줌 예) "hello123" -> 🟩⬜⬜🟩⬜⬜⬜⬜ 이런 QR 이미지 생성됨
-        qr = qrcode.make(data)
+        qr = qrcode.make(user)
         buffer = (
             BytesIO()
         )  # 이미지 파일을 메모리(RAM) 상의 가상 파일에 저장하기 위한 준(하드디스크에 저장하지 않고 응답 직전에 메모리에 잠깐 저장)

@@ -1,0 +1,1214 @@
+openapi: 3.0.1
+info:
+  title: Potato API
+  version: "1.0.0"
+  description: 감자 API 명세서
+
+paths:
+  /api/users/me/:
+    get:
+      summary: 내 정보 조회
+      tags:
+        - 회원
+      responses:
+        '200':
+          description: 내 정보 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+
+    patch:
+      summary: 내 정보 수정
+      tags:
+        - 회원
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: 내 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 잘못된 요청
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+
+    delete:
+      summary: 회원 탈퇴
+      tags:
+        - 회원
+      responses:
+        '204':
+          description: 회원 탈퇴 성공
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+
+  /api/auth/login/naver/:
+  post:
+    summary: 소셜 로그인 (access_token을 받아 JWT 발급)
+    tags:
+      - 인증
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: "네이버에서 받은 access_token"
+              refresh_token:
+                type: string
+                description: "네이버에서 받은 refresh_token"
+            required:
+              - access_token
+              - refresh_token
+    responses:
+      '200':
+        description: 로그인 성공 (JWT 발급)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access:
+                  type: string
+                refresh:
+                  type: string
+                user_id:
+                  type: integer
+                nickname:
+                  type: string
+      '400':
+        description: 잘못된 요청
+      '500':
+        description: 서버 오류
+
+  /api/auth/login/google/:
+    post:
+      summary: 소셜 로그인 (access_token을 받아 JWT 발급)
+      tags:
+        - 인증
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: "구글에서 받은 access_token"
+                refresh_token:
+                  type: string
+                  description: "구글에서 받은 refresh_token"
+              required:
+                - access_token
+                - refresh_token
+      responses:
+        '200':
+          description: 로그인 성공 (JWT 발급)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+                  user_id:
+                    type: integer
+                  nickname:
+                    type: string
+        '400':
+          description: 잘못된 요청
+        '500':
+          description: 서버 오류
+
+  /api/auth/login/kakao/:
+    post:
+      summary: 소셜 로그인 (access_token을 받아 JWT 발급)
+      tags:
+        - 인증
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  description: "카카오에서 받은 access_token"
+                refresh_token:
+                  type: string
+                  description: "카카오에서 받은 refresh_token"
+              required:
+                - access_token
+                - refresh_token
+      responses:
+        '200':
+          description: 로그인 성공 (JWT 발급)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+                  user_id:
+                    type: integer
+                  nickname:
+                    type: string
+        '400':
+          description: 잘못된 요청
+        '500':
+          description: 서버 오류
+
+  /api/auth/logout/:
+    post:
+      summary: 소셜 로그아웃
+      tags:
+        - 인증
+      description: "현재 로그인된 소셜 계정의 인증 해제 및 세션/토큰 만료"
+      responses:
+        '204':
+          description: 로그아웃 성공 (콘텐츠 없음)
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+
+  /api/qrcode/:
+    get:
+      summary: QR 코드 이미지 생성
+      tags:
+        - QR
+      parameters:
+        - name: data
+          in: query
+          required: true
+          schema:
+            type: string
+          description: QR로 변환할 데이터
+      responses:
+        '200':
+          description: QR 코드 이미지 반환
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: 잘못된 요청
+        '500':
+          description: 서버 오류
+
+  /api/diary/: # GET, POST
+    get:
+      tags:
+        - Diary
+      summary: 일기 전체 조회
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiaryResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+    post:
+      tags:
+        - Diary
+      summary: 일기 작성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiaryCreateRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryResponse'
+        '400':
+            description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/{diary_id}/: # GET, PATCH, DELETE
+    get:
+      tags:
+        - Diary
+      summary: 일기 상세 조회
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryDetailResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+    patch:
+      tags:
+        - Diary
+      summary: 일기 수정
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiaryUpdateRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryResponse'
+        '400':
+          description: 잘못된 요청
+        '500':
+          description: 서버 오류
+
+    delete:
+      tags:
+        - Diary
+      summary: 일기 삭제 (실제 삭제가 아닌 is_deleted = true)
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 일기 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/{diary_id}/images/: # GET, POST
+    get:
+      tags:
+        - Diary Image
+      summary: 일기 이미지 목록 조회
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiaryImageResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+    post:
+      tags:
+        - Diary Image
+      summary: 일기 이미지 업로드
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryImageResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/{diary_id}/images/{diary_image_id}/: # DELETE
+    delete:
+      tags:
+        - Diary Image
+      summary: 일기 이미지 삭제 (실제 삭제가 아닌 is_deleted = true)
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: diary_image_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/calendar/: # GET
+    get:
+      tags:
+        - Diary Calendar
+      summary: 한 달 동안의 날짜별 대표 감정(이모지+색상)과 일기 ID를 달력 UI용으로 조회
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/{diary_id}/comments/:
+    get:
+      tags:
+        - Diary Comments
+      summary: 일기 댓글 목록 조회
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 일기 없음
+        '500':
+          description: 서버 오류
+
+    post:
+      tags:
+        - Diary Comments
+      summary: 일기 댓글 작성
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreateRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 일기 없음
+        '500':
+          description: 서버 오류
+
+  /api/diary/{diary_id}/comments/{comment_id}/:
+    patch:
+      tags:
+        - Diary Comments
+      summary: 댓글 수정
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdateRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 댓글 없음
+        '500':
+          description: 서버 오류
+
+    delete:
+      tags:
+        - Diary Comments
+      summary: 댓글 삭제 (is_deleted = true)
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 댓글 없음
+        '500':
+          description: 서버 오류
+
+  # 좋아요(Like) API
+  /api/diary/{diary_id}/like/:
+    post:
+      tags:
+        - Diary Like
+      summary: 일기 좋아요 추가
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 일기 없음
+        '500':
+          description: 서버 오류
+
+    delete:
+      tags:
+        - Diary Like
+      summary: 일기 좋아요 취소 (is_deleted = true)
+      parameters:
+        - name: diary_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 좋아요 없음
+        '500':
+          description: 서버 오류
+
+  # 친구초대(Friends, Qr) API
+  /api/friends/invite/:
+    post:
+      tags:
+          - Diary Friends
+      summary: 친구 초대(QR로만)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FriendInviteRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendInviteResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 유저 없음
+        '500':
+          description: 서버 오류
+
+  /api/friends/{friend_id}/accept/:
+    post:
+      tags:
+          - Diary Friends
+      summary: 친구 요청 수락
+      parameters:
+        - name: friend_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 친구 요청 없음
+        '500':
+          description: 서버 오류
+
+  /api/friends/{friend_id}/reject/:
+    post:
+      tags:
+          - Diary Friends
+      summary: 친구 요청 거절
+      parameters:
+        - name: friend_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 친구 요청 없음
+        '500':
+          description: 서버 오류
+
+  /api/emotions/:
+    get:
+      summary: 감정 목록 조회
+      tags:
+        - 감정
+      responses:
+        '200':
+          description: 성공 – 감정 목록 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmotionListResponse'
+
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/emotion/trend/:
+    get:
+      summary: 감정 변화 그래프
+      tags:
+        - 통계/감정 변화
+      parameters:
+        - name: from
+          in: query
+          description: 조회 시작일 (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          description: 조회 종료일 (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 성공 – 감정 변화 데이터 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmotionTrendResponse'
+
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/emotion/count/:
+    get:
+      summary: 감정별 사용량 그래프
+      tags:
+        - 통계/감정 변화
+      parameters:
+        - name: from
+          in: query
+          description: 조회 시작일 (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          description: 조회 종료일 (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 성공 – 감정별 사용량 데이터 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmotionCountResponse'
+
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+  /api/notifications/:
+    get:
+      summary: 알림 조회
+      tags:
+       - 알림 조회/생성
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListResponse'
+
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 리소스 없음
+        '500':
+          description: 서버 오류
+
+    post:
+        summary: 알림 생성
+        tags:
+          - 알림 조회/생성
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCreateRequest'
+        responses:
+          '201':
+            description: 알림 생성 성공
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/NotificationResponse'
+          '400':
+            description: 잘못된 요청
+          '500':
+            description: 서버 오류
+
+  /api/notifications/{notification_id}/:
+    patch:
+      summary: 알림 수정
+      tags:
+        - 알림 조회/생성
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationUpdateRequest'
+      responses:
+        '200':
+          description: 알림 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 알림 없음
+        '500':
+          description: 서버 오류
+
+    delete:
+      summary: 알림 삭제
+      tags:
+        - 알림 조회/생성
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 알림 삭제 성공
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 알림 없음
+        '500':
+          description: 서버 오류
+
+
+components:
+  schemas:
+    DiaryCreateRequest:
+      type: object
+      properties:
+        emotion_id:
+          type: integer
+        content:
+          type: string
+        visibility:
+          type: boolean
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiaryImageResponse'
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - emotion_id
+        - content
+        - visibility
+        - created_at
+
+    DiaryUpdateRequest:
+      type: object
+      properties:
+        emotion_id:
+          type: integer
+        content:
+          type: string
+        update_at:
+          type: string
+          format: date-time
+
+    DiaryResponse:
+      type: object
+      properties:
+        diary_id:
+          type: integer
+        emotion_id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        like_count:
+          type: integer
+          description: "일기에 대한 총 좋아요 수"
+
+    DiaryDetailResponse:
+      type: object
+      properties:
+        diary_id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        emotion:
+          $ref: '#/components/schemas/EmotionResponse'
+        content:
+          type: string
+        visibility:
+          type: boolean
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiaryImageResponse'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        like_count:
+          type: integer
+          description: "일기에 대한 총 좋아요 수"
+
+    UserResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        nickname:
+          type: string
+        profile_image:
+          type: string
+
+    DiaryImageResponse:
+      type: object
+      properties:
+        diary_image_id:
+          type: integer
+        image_url:
+          type: string
+
+    CommentResponse:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+        user_id:
+          type: integer
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    LikeResponse:
+      type: object
+      properties:
+        like_id:
+          type: integer
+        diary_id:
+          type: integer
+        user_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CalendarResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        emotion_id:
+          type: integer
+        diary_id:
+          type: integer
+
+    CommentCreateRequest:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    CommentUpdateRequest:
+      type: object
+      properties:
+        content:
+          type: string
+
+    FriendInviteRequest:
+      type: object
+      properties:
+        invite_type:
+          type: string
+          enum: [qr]  # QR만 허용
+        invite_code:
+          type: string
+          description: "QR 코드 값"
+      required:
+        - invite_type
+        - invite_code
+
+    FriendInviteResponse:
+      type: object
+      properties:
+        friend_id:
+          type: integer
+        status:
+          type: string
+        invited_at:
+          type: string
+          format: date-time
+
+    FriendResponse:
+      type: object
+      properties:
+        friend_id:
+          type: integer
+        user_id:
+          type: integer
+        friend_user_id:
+          type: integer
+        is_friend:
+          type: boolean
+          description: "true=친구, false=친구 아님"
+        created_at:
+          type: string
+          format: date-time
+        responded_at:
+          type: string
+          format: date-time
+
+    EmotionListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          emotion:
+            $ref: '#/components/schemas/EmotionResponse'
+
+    EmotionTrendResponse:
+      type: object
+      properties:
+        emotion:
+          $ref: '#/components/schemas/EmotionResponse'
+        labels:
+          type: array
+          items:
+            type: string
+        values:
+          type: array
+          items:
+            type: integer
+
+    EmotionCountResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          emotion:
+            $ref: '#/components/schemas/EmotionResponse'
+          count:
+            type: integer
+
+
+    NotificationListResponse:
+      type: array
+      items:
+        properties:
+          notification:
+            $ref: '#/components/schemas/NotificationResponse'
+
+    EmotionResponse:
+      type: object
+      properties:
+        emotion_id:
+          type: integer
+        emoji:
+          type: string
+        emotion:
+          type: string
+
+    NotificationResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        notification_id:
+          type: integer
+        notificationtype:
+          type: string
+        notificationmessage:
+          type: string
+        created_at:
+          type: string
+
+    NotificationCreateRequest:
+      type: object
+      properties:
+        notificationtype:
+          type: string
+        notificationmessage:
+          type: string
+      required:
+        - notificationtype
+        - notificationmessage
+
+    NotificationUpdateRequest:
+      type: object
+      properties:
+        notificationtype:
+          type: string
+        notificationmessage:
+          type: string
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+        profile_image:
+          type: string

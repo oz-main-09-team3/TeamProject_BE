@@ -1,3 +1,5 @@
+import os
+
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
@@ -20,33 +22,35 @@ class OAuthLoginView(APIView):
         try:
             oauth_client = OAuth2Client(provider, code, redirect_uri)
             access_token, user_info = oauth_client.get_token_and_user_info()
+            user, _ = User.objects.get_or_create(
+                username=f"{provider}{user_info['id']}",
+                nickname=user_info.get("nickname", ""),
+                profile=user_info.get("profile_img", None),
+            )
+
+            social_account, created = SocialAccount.objects.get_or_create(
+                provider=provider,
+                provider_user_id=(provider_user_id := user_info["id"]),
+                defaults={"user": user},
+            )
+            print(
+                f"🔎 provider_user_id 길이: {len(provider_user_id)} / 값: {provider_user_id}",
+                flush=True,
+            )
+            user = social_account.user
+
+            # JWT 발급
+            refresh = RefreshToken.for_user(user)
+            return Response(
+                {
+                    "token": str(refresh.access_token),
+                    "refresh_token": str(refresh),
+                    "user": UserSerializer(user).data,
+                }
+            )
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        user_id = user_info["id"]
-        # 소셜 계정 존재 여부 확인 및 유저 생성
-        social_account, created = SocialAccount.objects.get_or_create(
-            provider=provider,
-            provider_user_id=user_id,
-            defaults={
-                "user": User.objects.create(
-                    username=f"{provider}_{user_id}",
-                    nickname=user_info.get("nickname"),
-                    profile=user_info.get("profile_img"),
-                )
-            },
-        )
-        user = social_account.user
-
-        # JWT 발급
-        refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-                "user": UserSerializer(user).data,
-            }
-        )
 
 
 class UserMeAPIView(APIView):
