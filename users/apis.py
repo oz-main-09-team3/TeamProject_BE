@@ -1,3 +1,5 @@
+import os
+
 import requests
 from django.conf import settings
 
@@ -22,20 +24,43 @@ class OAuth2Client:
         token_url = "https://kauth.kakao.com/oauth/token"
         data = {
             "grant_type": "authorization_code",
-            "client_id": settings.KAKAO_CLIENT_ID,
+            "client_id": os.getenv("KAKAO_CLIENT_ID"),
             "redirect_uri": self.redirect_uri,
             "code": self.code,
+            "client_secret": os.getenv("KAKAO_CLIENT_SECRET"),
         }
-        access_token = requests.post(token_url, data=data).json().get("access_token")
-        user_info = requests.get(
+        print("🔍 Kakao 요청:", data, flush=True)
+
+        token_response = requests.post(token_url, data=data)
+        token_data = token_response.json()
+        print("🔐 Kakao 응답:", token_data, flush=True)
+
+        access_token = token_data.get("access_token")
+        if not access_token:
+            raise ValueError(f"카카오 access_token 발급 실패: {token_data}")
+
+        user_info_response = requests.get(
             "https://kapi.kakao.com/v2/user/me",
-            headers={"Authorization": f"Bearer {access_token}"},
-        ).json()
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )
+
+        user_info = user_info_response.json()
+        print("👤 Kakao 사용자 정보:", user_info, flush=True)
+
+        if "id" not in user_info:
+            raise ValueError(f"카카오 응답에 'id'가 없습니다: {user_info}")
+        # "id": str(user_info["id"]),  # ← 이제 'id'라는 key로 반환
+        # "email": user_info.get("kakao_account", {}).get("email"),
+        # "nickname": user_info.get("properties", {}).get("nickname"),
+        # "profile_img": user_info.get("properties", {}).get("profile_image", None),
         return access_token, {
-            "provider_user_id": str(user_info["id"]),
+            "id": str(user_info["id"]),  # ← 이제 'id'라는 key로 반환
             "email": user_info.get("kakao_account", {}).get("email"),
             "nickname": user_info.get("properties", {}).get("nickname"),
-            "profile": user_info.get("properties", {}).get("profile_image"),
+            "profile_img": user_info.get("properties", {}).get("profile_image"),
         }
 
     def _naver(self):
