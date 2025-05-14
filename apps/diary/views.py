@@ -74,17 +74,6 @@ class DiaryView(APIView):
             page = paginator.paginate_queryset(diaries, request)
             serializer = DiarySerializer(page, many=True)
 
-            data = serializer.data
-            for diary_data in data:
-                diary = Diary.objects.get(id=diary_data["id"])
-                diary_emotion = getattr(diary, "emotion", None)
-                if diary_emotion:
-                    diary_data["emotion"] = EmotionSerializer(
-                        diary_emotion.emotion
-                    ).data
-                else:
-                    diary_data["emotion"] = None
-
             return paginator.get_paginated_response(serializer.data)
 
     def patch(self, request, diary_id):
