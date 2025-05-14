@@ -36,4 +36,5 @@ urlpatterns = [
     # API-Swagger
     path("swagger/", TemplateView.as_view(template_name="swagger.html")),
     path("api/friends/", include("friendlist.urls")),
+    path("api/friends/", include("friends.urls")),
 ]
