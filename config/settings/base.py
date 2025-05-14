@@ -15,6 +15,8 @@ import random
 from datetime import timedelta
 from pathlib import Path
 
+from .logging import DEFAULT_LOGGING
+
 # dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
 
 
@@ -207,3 +209,5 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
+
+LOGGING = DEFAULT_LOGGING
