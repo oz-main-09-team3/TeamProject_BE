@@ -4,7 +4,7 @@ from emotion.models import Emotion, EmotionData
 
 
 class EmotionSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+    # image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Emotion
