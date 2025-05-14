@@ -21,7 +21,6 @@ jobs:
             cd ~/TeamProject_BE
             git pull origin main
             
-            mkdir -p logs
             mkdir -p envs
             echo "DJANGO_SETTINGS_MODULE=config.settings.prod" > envs/prod.env
             echo "ENV_MODE=prod" >> envs/prod.env
