@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from apps.diary.models import CommentLike, Diary, DiaryImage, Emotion
+from emotion.serializers import EmotionSerializer
 from users.models import User
 
 
