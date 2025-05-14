@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.db import models
 
+from emotion.models import Emotion
 from users.models import User
 
 
@@ -47,20 +48,6 @@ class DiaryImage(models.Model):
 
     def __str__(self):
         return f"Image for Diary {self.diary.id}"
-
-
-class Emotion(models.Model):
-    emoji = models.CharField(
-        max_length=255,
-        verbose_name="감자 이모지 url",
-    )
-    emotion = models.CharField(
-        max_length=10,
-        verbose_name="감정",
-    )
-
-    def __str__(self):
-        return f"Emotion {self.emotion}"
 
 
 # Emotion은 사전 정의된 감정 목록이며, 일기와의 연결을 별도 모델로 관리해야 함.

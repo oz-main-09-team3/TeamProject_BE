@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from emotion.serializers import EmotionSerializer
+
 from .apis import (
     create_comment,
     create_comment_like,
@@ -30,7 +32,6 @@ from .serializers import (
     DiaryDetailSerializer,
     DiaryImageSerializer,
     DiarySerializer,
-    EmotionSerializer,
 )
 
 
