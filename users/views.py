@@ -7,8 +7,9 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from users.models import SocialAccount, User
+
 from .apis import OAuth2Client
-from .models import SocialAccount, User
 from .serializers import OAuthLoginSerializer, UserMeSerializer, UserSerializer
 
 
@@ -21,36 +22,37 @@ class OAuthLoginView(APIView):
         redirect_uri = request.data.get("redirect_uri")
 
         try:
-            # 🔐 소셜 access_token 및 사용자 정보 가져오기
             oauth_client = OAuth2Client(provider, code, redirect_uri)
             access_token, user_info = oauth_client.get_token_and_user_info()
 
-            # 📌 username 생성
-            provider_user_id = user_info["id"]
+            provider_user_id = str(user_info["id"])
             username = f"{provider}{provider_user_id}"
 
-            # 👤 유저 생성 또는 가져오기 (중복 시 예외 처리)
+            # ✅ 1. 소셜 계정 먼저 조회
             try:
-                user, created = User.objects.get_or_create(
+                social_account = SocialAccount.objects.get(
+                    provider=provider, provider_user_id=provider_user_id
+                )
+                user = social_account.user
+
+            except SocialAccount.DoesNotExist:
+                # ✅ 2. 연결 안 돼 있으면, username 중복 확인
+                user, _ = User.objects.get_or_create(
                     username=username,
                     defaults={
                         "nickname": user_info.get("nickname", ""),
                         "profile": user_info.get("profile_img", None),
                     },
                 )
-            except IntegrityError:
-                user = User.objects.get(username=username)
 
-            # 🔗 SocialAccount 연결
-            social_account, _ = SocialAccount.objects.get_or_create(
-                provider=provider,
-                provider_user_id=provider_user_id,
-                defaults={"user": user},
-            )
+                # ✅ 3. 소셜 계정 연결
+                SocialAccount.objects.create(
+                    provider=provider,
+                    provider_user_id=provider_user_id,
+                    user=user,
+                )
 
-            user = social_account.user  # 혹시라도 연결된 다른 유저가 있다면 보정
-
-            # 🔑 JWT 발급
+            # 🔐 JWT 발급
             refresh = RefreshToken.for_user(user)
 
             return Response(
@@ -62,7 +64,7 @@ class OAuthLoginView(APIView):
             )
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=400)
 
 
 class UserMeAPIView(APIView):
