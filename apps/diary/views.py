@@ -67,7 +67,9 @@ class DiaryView(APIView):
                 )
         else:
             # 목록 조회
-            diaries = Diary.objects.filter(user=request.user, is_deleted=False)
+            diaries = Diary.objects.filter(
+                user=request.user, is_deleted=False
+            ).select_related("emotion__emotion")
             paginator = DiaryPagination()
             page = paginator.paginate_queryset(diaries, request)
             serializer = DiarySerializer(page, many=True)
@@ -83,7 +85,7 @@ class DiaryView(APIView):
                 else:
                     diary_data["emotion"] = None
 
-            return paginator.get_paginated_response(data)
+            return paginator.get_paginated_response(serializer.data)
 
     def patch(self, request, diary_id):
         if not diary_id:
