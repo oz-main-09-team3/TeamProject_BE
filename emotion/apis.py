@@ -25,7 +25,7 @@ class EmotionListView(APIView):
             {
                 "id": e.id,
                 "emotion": e.emotion,
-                "image_url": e.image_url,  # 이건 property 이므로 /static/emotions/1.png형태
+                "image_url": e.image_url,  # 이건 property 이므로 /static/emotions/1.png 형태임.
             }
             for e in emotions
         ]
