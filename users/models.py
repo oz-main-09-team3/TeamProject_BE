@@ -24,5 +24,4 @@ class SocialAccount(models.Model):
         unique_together = ("provider", "provider_user_id")
 
 
-
 # 제발.... 제발....
