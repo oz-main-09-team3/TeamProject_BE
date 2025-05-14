@@ -55,6 +55,7 @@ jobs:
       - name: Create dev.env file
         run: |
           mkdir -p envs
+          mkdir -p logs
           echo "DJANGO_SETTINGS_MODULE=config.settings.dev" >> envs/dev.env
           echo "ENV_MODE=dev" >> envs/dev.env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> envs/dev.env
