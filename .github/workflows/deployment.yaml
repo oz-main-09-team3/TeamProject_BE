@@ -37,7 +37,7 @@ jobs:
             echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> envs/prod.env
             echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> envs/prod.env            
 
-            pip install poetry
+            source ~/.zshrc
             poetry install --no-interaction --no-ansi
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
