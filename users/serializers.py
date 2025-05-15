@@ -4,6 +4,9 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    # ImageField 에 업로드된 S3 URL 을 반환합니다
+    profile = serializers.ImageField(read_only=True)
+
     class Meta:
         model = User
         fields = [
