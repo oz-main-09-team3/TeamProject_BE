@@ -8,7 +8,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import SocialAccount, User
 
 from .apis import OAuth2Client
-from .serializers import OAuthLoginSerializer, UserMeSerializer, UserSerializer
+from .serializers import (
+    OAuthLoginSerializer,
+    UserMeSerializer,
+    UserSerializer,
+)
 
 
 class OAuthLoginView(APIView):
