@@ -12,7 +12,7 @@ class EmotionSerializer(serializers.ModelSerializer):
 
 
 class EmotionTrendViewSerializer(serializers.ModelSerializer):
-    emotion = EmotionSerializer()
+    emotion = EmotionSerializer(read_only=True)
 
     class Meta:
         model = EmotionData

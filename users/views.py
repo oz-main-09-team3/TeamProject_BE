@@ -45,6 +45,9 @@ class OAuthLoginView(APIView):
                     },
                 )
 
+                user.profile = user_info.get("profile_img", None)
+                user.save()
+
                 # ✅ 3. 소셜 계정 연결
                 SocialAccount.objects.create(
                     provider=provider,
