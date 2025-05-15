@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR / "envs" / "prod.env")  # 루트의 .env 로드
 
 DEBUG = False
-ALLOWED_HOSTS = ["handsomepotato.p-e.kr"]
+ALLOWED_HOSTS = ["handsomepotato.p-e.kr", "43.201.23.196"]
 
 
 DATABASES["default"].update(
@@ -29,5 +29,4 @@ AWS_S3_CUSTOM_DOMAIN = (
     f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 )
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+DEFAULT_ACL = "public-read"
