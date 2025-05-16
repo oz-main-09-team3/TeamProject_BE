@@ -64,6 +64,10 @@ jobs:
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> envs/dev.env
           echo "POSTGRES_HOST=localhost"                          >> envs/dev.env
           echo "POSTGRES_PORT=5432"                               >> envs/dev.env
+          echo "AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME }}" >> envs/dev.env
+          echo "AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}" >> envs/dev.env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> envs/dev.env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> envs/dev.env
 
       - name: Wait for PostgreSQL to be ready
         run: sleep 10

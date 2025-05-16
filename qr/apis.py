@@ -1,27 +1,47 @@
-from io import BytesIO  # 이미지를 메모리에 임시로 저장하는 가상의 파일 객체
+from io import BytesIO
 
-import qrcode  # QR 코드를 만들어주는 파이썬 라이브러리
 from django.http import HttpResponse
+from qrcode.constants import ERROR_CORRECT_L
+from qrcode.main import QRCode
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from qr.models import QrCode
+from users.models import User
 
 
 class QrCodeCreateView(APIView):
     def get(self, request):
-        user = request.query_params.get(
-            "username"
-        )  # 예) /api/qrcode/?data=hello123 -> data="hello123"
-        if not user:  # data 부분이 없으면 오류메시지와 400 Bad Request 응답을 보냄
+        username = request.query_params.get("username")
+        if not username:
             return Response({"detail": "username 파라미터가 필요합니다."}, status=400)
-        # qrcode.make(): 문자열을 QR 코드 이미지로 자동 변환 해줌 예) "hello123" -> 🟩⬜⬜🟩⬜⬜⬜⬜ 이런 QR 이미지 생성됨
-        qr = qrcode.make(user)
-        buffer = (
-            BytesIO()
-        )  # 이미지 파일을 메모리(RAM) 상의 가상 파일에 저장하기 위한 준(하드디스크에 저장하지 않고 응답 직전에 메모리에 잠깐 저장)
-        qr.save(buffer, format="PNG")  # QR 이미지를 PNG 형식으로 buffer에 저장
-        buffer.seek(
-            0
-        )  # buffer의 파일 커서를 맨 앞으로 이동 -> 이미지 데이터를 읽을 준비를 한다
-        # 메모리에 저장된 QR 이미지 데이터를 꺼내서 바로 응답으로 보냄
-        # 응답의 Content-Type을 image/png로 설정했기 때문에 브라우저는 이미지를 바로 보여줌
-        return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+        user = get_object_or_404(User, username=username)
+
+        qr_instance, _ = QrCode.objects.get_or_create(
+            user=user, defaults={"invite_code": f"{username}_초대코드"}
+        )
+
+        try:
+            qr = QRCode(
+                version=1,
+                error_correction=ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(qr_instance.invite_code)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill_color="black", back_color="white")
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            buffer.seek(0)
+
+            return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+        except Exception as e:
+            print("QR 코드 생성 실패:", str(e))
+            return Response(
+                {"error": "QR 코드 생성 중 오류 발생", "detail": str(e)}, status=500
+            )
