@@ -60,12 +60,12 @@ def add_friend_by_qr(inviter_invite_code, current_user):
         return None, "자기 자신에게 친구 요청은 불가합니다."
 
     # 친구 상태인지 체크
-    if DiaryFriend.objects.filter(user=current_user, friend_user_id=inviter, status="accepted").exists():
+    if DiaryFriend.objects.filter(
+        user=current_user, friend_user_id=inviter, status="accepted"
+    ).exists():
         return None, "이미 친구입니다."
 
     diary_friend = DiaryFriend.objects.create(
-        user=current_user,
-        friend_user_id=inviter,
-        status="accepted"
+        user=current_user, friend_user_id=inviter, status="accepted"
     )
     return diary_friend, None
