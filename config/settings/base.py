@@ -15,6 +15,8 @@ import random
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from .logging import DEFAULT_LOGGING
 
 # dotenv_values : env 파일의 경로를 파라미터로 전달 받아 해당 파일을 읽어온 후 key, value 형태로 매핑하여 dict로 반환한다.
@@ -22,7 +24,7 @@ from .logging import DEFAULT_LOGGING
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
+load_dotenv(BASE_DIR / "envs" / "dev.env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -56,8 +58,8 @@ INSTALLED_APPS = [
     "qr",
     "users",
     "notifications",
-    "friendlist",
     "friends",
+    "friendlist.apps.FriendlistConfig",
     # 3rd party
     "django_extensions",
     "rest_framework",
@@ -176,8 +178,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # 배포용이면 사용
+# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # 배포용이면 사용
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -212,4 +214,31 @@ REST_FRAMEWORK = {
     ),
 }
 
-LOGGING = DEFAULT_LOGGING
+SITE_ID = 1
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "location": "media",
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            "region_name": os.getenv("AWS_S3_REGION_NAME"),
+            "default_acl": "bucket-owner-full-control",
+            "querystring_auth": False,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "location": "static",
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+        },
+    },
+}
+
+AWS_S3_CUSTOM_DOMAIN = f"{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.amazonaws.com"
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"

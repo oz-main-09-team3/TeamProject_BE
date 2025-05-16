@@ -1,18 +1,19 @@
-from rest_framework.exceptions import NotFound
+from django.db.models import Q
 
-from friendlist.models import FriendList
+from friends.models import DiaryFriend
 from users.models import User
 
 
-def get_friend_list(user):
-    friend_relations = FriendList.objects.filter(user=user)
-    friends = [relation.friend for relation in friend_relations]
+def get_friends_by_status(user: User, status: str) -> list[User]:
+    # 1) 나 → 상대 또는 상대 → 나 방향의 모든 DiaryFriend 레코드를 상태별로 필터
+    queryset = DiaryFriend.objects.filter(
+        Q(user=user, status=status) | Q(friend_user_id=user, status=status)
+    )
+
+    friends: list[User] = []
+    for rel in queryset:
+        if rel.user_id == user.id:
+            friends.append(rel.friend_user_id)
+        else:
+            friends.append(rel.user)
     return friends
-
-
-def delete_friend(user, friend_id):
-    try:
-        friend_relation = FriendList.objects.get(user=user, friend_id=friend_id)
-        friend_relation.delete()
-    except FriendList.DoesNotExist:
-        raise NotFound("친구를 찾을 수 없습니다")
