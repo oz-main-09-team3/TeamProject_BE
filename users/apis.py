@@ -1,7 +1,6 @@
 import os
 
 import requests
-from django.conf import settings
 
 
 class OAuth2Client:
@@ -41,9 +40,13 @@ class OAuth2Client:
 
         user_info_response = requests.get(
             "https://kapi.kakao.com/v2/user/me",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/x-www-form-urlencoded",
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={
+                "property_keys": '["properties.nickname",'
+                '"properties.profile_image",'
+                '"kakao_account.email",'
+                '"kakao_account.birthday",'
+                '"kakao_account.phone_number"]'
             },
         )
 
