@@ -48,7 +48,6 @@ class OAuthLoginView(APIView):
                 for field, new_val in {
                     "nickname": user_info.get("nickname"),
                     "phone_num": user_info.get("phone_number"),
-                    "birthday": user_info.get("birthday"),
                     "email": user_info.get("email"),
                 }.items():
                     if new_val and getattr(user, field) != new_val:
@@ -65,7 +64,6 @@ class OAuthLoginView(APIView):
                     defaults={
                         "nickname": user_info.get("nickname", ""),
                         "phone_num": user_info.get("phone_number", ""),
-                        "birthday": user_info.get("birthday", ""),
                         "email": user_info.get("email", ""),
                     },
                 )

@@ -47,6 +47,11 @@ class UserMeSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    birthday = serializers.DateField(
+        required=False,
+        allow_null=True,  # null 허용
+    )
+
     class Meta:
         model = User
         fields = ["nickname", "birthday", "profile", "phone_num", "email"]
