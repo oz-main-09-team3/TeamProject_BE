@@ -240,5 +240,5 @@ STORAGES = {
     },
 }
 
-AWS_S3_CUSTOM_DOMAIN = f"{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.amazonaws.com"
+AWS_S3_CUSTOM_DOMAIN = f"{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.amazonaws.com"
 STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
