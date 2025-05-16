@@ -223,6 +223,43 @@ paths:
         '500':
           description: 서버 오류
 
+  /api/qrcode/qr-invite/:
+    post:
+      tags:
+        - QR
+      summary: QR 코드 친구 추가
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invite_code:
+                  type: string
+                  example: "{username}_초대코드"
+              required:
+                - invite_code
+      responses:
+        '201':
+          description: Friend relationship created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryFriend'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /api/diary/: # GET, POST
     get:
       tags:
@@ -1212,3 +1249,117 @@ components:
           type: string
         profile_image:
           type: string
+
+    DiaryFriend:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user:
+          type: integer
+          example: 2
+        friend_user_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [ pending, accepted, rejected ]
+          example: accepted
+        requested_at:
+          type: string
+          format: date-time
+          example: "2024-05-16T12:34:56Z"
+        responded_at:
+          type: string
+          format: date-time
+          example: "2024-05-16T12:34:56Z"
+
+      Error:
+        type: object
+        properties:
+          message:
+            type: string
+            example: "Error message description"
+        required:
+          - message
+
+      securitySchemes:
+        BearerAuth:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+          description: Enter JWT token in format "Bearer {token}"
+
+      responses:
+        InvalidInviteCode:
+          description: Invalid invite code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidCode:
+                  value:
+                    message: "유효하지 않은 초대코드입니다."
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error message description"
+      required:
+        - message
+
+      securitySchemes:
+        BearerAuth:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+          description: Enter JWT token in format "Bearer {token}"
+
+      responses:
+        InvalidInviteCode:
+          description: Invalid invite code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidCode:
+                  value:
+                    message: "유효하지 않은 초대코드입니다."
+
+        SelfInvite:
+          description: Self invitation attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                selfInvite:
+                  value:
+                    message: "자기 자신에게 친구 요청은 불가합니다."
+
+        AlreadyRequested:
+          description: Duplicate friend request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                duplicateRequest:
+                  value:
+                    message: "이미 친구 요청을 보냈습니다."
+
+        AlreadyFriends:
+          description: Already friends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                alreadyFriends:
+                  value:
+                    message: "이미 친구입니다."
