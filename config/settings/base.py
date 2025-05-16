@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "notifications",
     "friendlist",
     "friends",
+    "friendlist.apps.FriendlistConfig",
     # 3rd party
     "django_extensions",
     "rest_framework",

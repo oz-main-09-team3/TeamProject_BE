@@ -38,7 +38,7 @@ class FriendDeleteAPIView(APIView):
         delete_queryset = DiaryFriend.objects.filter(
             (
                 Q(user=request.user, friend_user_id=friend_id)
-                | Q(user_id=friend_id, friend_user=request.user)
+                | Q(user_id=friend_id, friend_user_id=request.user)
             )
             & Q(status="accepted")
         )
