@@ -30,3 +30,5 @@ AWS_S3_CUSTOM_DOMAIN = (
 )
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 DEFAULT_ACL = "public-read"
+
+LOGGING = DEFAULT_LOGGING

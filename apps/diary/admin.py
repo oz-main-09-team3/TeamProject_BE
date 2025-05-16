@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from apps.diary.models import Diary, DiaryImage
+
+admin.site.register(DiaryImage)
+admin.site.register(Diary)
