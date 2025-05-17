@@ -19,17 +19,11 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from apps import diary
-from users.views import LogoutAPIView, OAuthLoginView, UserMeAPIView
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/emotions/", include("emotion.urls")),
-    path(
-        "api/auth/login/<str:provider>/", OAuthLoginView.as_view(), name="oauth-login"
-    ),
-    path("api/users/me/", UserMeAPIView.as_view(), name="user-me"),
-    path("api/auth/logout/", LogoutAPIView.as_view(), name="logout"),
+    path("api/auth/", include("users.auth_urls")),
+    path("api/users/", include("users.urls")),
     path("api/diary/", include("apps.diary.urls")),
     path("api/qrcode/", include("qr.urls")),
     path("api/notifications/", include("notifications.urls")),
@@ -37,4 +31,5 @@ urlpatterns = [
     path("swagger/", TemplateView.as_view(template_name="swagger.html")),
     path("api/friends/", include("friendlist.urls")),
     path("api/friends/", include("friends.urls")),
+    path("api/frienddiary/", include("frienddiary.urls")),
 ]
