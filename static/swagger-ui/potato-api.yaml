@@ -3,13 +3,61 @@ info:
   title: Potato API
   version: "1.0.0"
   description: 감자 API 명세서
-
+security:
+  - bearerAuth: []
 paths:
+  /api/auth/login/{provider}/:
+    post:
+      summary: 소셜 로그인 (authorization code → JWT 발급)
+      tags:
+        - Auth Login
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum: [kakao, google, naver]
+          description: 사용할 소셜 로그인 제공자
+      requestBody:
+        description: OAuth authorization code 및 redirect URI
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthLoginRequest'
+      responses:
+        '200':
+          description: 로그인 성공 (토큰 및 사용자 정보 반환)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthLoginResponse'
+        '400':
+          description: 잘못된 요청 또는 로그인 실패
+        '500':
+          description: 서버 오류
+  /api/auth/logout/:
+    post:
+      summary: 소셜 로그아웃
+      tags:
+        - Auth Login
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: 로그아웃 성공 (응답 본문 없음)
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
   /api/users/me/:
     get:
       summary: 내 정보 조회
       tags:
-        - 회원
+        - Users
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: 내 정보 반환
@@ -21,15 +69,31 @@ paths:
           description: 인증 필요
         '500':
           description: 서버 오류
-
+    delete:
+      summary: 회원 탈퇴
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: 회원 탈퇴 성공 (응답 본문 없음)
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+  /api/users/me/update/:
     patch:
       summary: 내 정보 수정
       tags:
-        - 회원
+        - Users
+      security:
+        - bearerAuth: []
       requestBody:
+        description: 수정할 사용자 정보 (multipart/form-data)
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/UserUpdateRequest'
       responses:
@@ -45,166 +109,13 @@ paths:
           description: 인증 필요
         '500':
           description: 서버 오류
-
-    delete:
-      summary: 회원 탈퇴
-      tags:
-        - 회원
-      responses:
-        '204':
-          description: 회원 탈퇴 성공
-        '401':
-          description: 인증 필요
-        '500':
-          description: 서버 오류
-
-  /api/auth/login/naver/:
-  post:
-    summary: 소셜 로그인 (access_token을 받아 JWT 발급)
-    tags:
-      - 인증
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              access_token:
-                type: string
-                description: "네이버에서 받은 access_token"
-              refresh_token:
-                type: string
-                description: "네이버에서 받은 refresh_token"
-            required:
-              - access_token
-              - refresh_token
-    responses:
-      '200':
-        description: 로그인 성공 (JWT 발급)
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                access:
-                  type: string
-                refresh:
-                  type: string
-                user_id:
-                  type: integer
-                nickname:
-                  type: string
-      '400':
-        description: 잘못된 요청
-      '500':
-        description: 서버 오류
-
-  /api/auth/login/google/:
-    post:
-      summary: 소셜 로그인 (access_token을 받아 JWT 발급)
-      tags:
-        - 인증
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                access_token:
-                  type: string
-                  description: "구글에서 받은 access_token"
-                refresh_token:
-                  type: string
-                  description: "구글에서 받은 refresh_token"
-              required:
-                - access_token
-                - refresh_token
-      responses:
-        '200':
-          description: 로그인 성공 (JWT 발급)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access:
-                    type: string
-                  refresh:
-                    type: string
-                  user_id:
-                    type: integer
-                  nickname:
-                    type: string
-        '400':
-          description: 잘못된 요청
-        '500':
-          description: 서버 오류
-
-  /api/auth/login/kakao/:
-    post:
-      summary: 소셜 로그인 (access_token을 받아 JWT 발급)
-      tags:
-        - 인증
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                access_token:
-                  type: string
-                  description: "카카오에서 받은 access_token"
-                refresh_token:
-                  type: string
-                  description: "카카오에서 받은 refresh_token"
-              required:
-                - access_token
-                - refresh_token
-      responses:
-        '200':
-          description: 로그인 성공 (JWT 발급)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  access:
-                    type: string
-                  refresh:
-                    type: string
-                  user_id:
-                    type: integer
-                  nickname:
-                    type: string
-        '400':
-          description: 잘못된 요청
-        '500':
-          description: 서버 오류
-
-  /api/auth/logout/:
-    post:
-      summary: 소셜 로그아웃
-      tags:
-        - 인증
-      description: "현재 로그인된 소셜 계정의 인증 해제 및 세션/토큰 만료"
-      responses:
-        '204':
-          description: 로그아웃 성공 (콘텐츠 없음)
-        '401':
-          description: 인증 필요
-        '500':
-          description: 서버 오류
-
   /api/qrcode/:
     get:
       summary: QR 코드 이미지 생성
       tags:
         - QR
       parameters:
-        - name: data
+        - name: username
           in: query
           required: true
           schema:
@@ -222,44 +133,6 @@ paths:
           description: 잘못된 요청
         '500':
           description: 서버 오류
-
-  /api/qrcode/qr-invite/:
-    post:
-      tags:
-        - QR
-      summary: QR 코드 친구 추가
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                invite_code:
-                  type: string
-                  example: "{username}_초대코드"
-              required:
-                - invite_code
-      responses:
-        '201':
-          description: Friend relationship created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DiaryFriend'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
   /api/diary/: # GET, POST
     get:
       tags:
@@ -280,7 +153,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
     post:
       tags:
         - Diary
@@ -304,7 +176,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/diary/{diary_id}/: # GET, PATCH, DELETE
     get:
       tags:
@@ -329,7 +200,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
     patch:
       tags:
         - Diary
@@ -357,7 +227,6 @@ paths:
           description: 잘못된 요청
         '500':
           description: 서버 오류
-
     delete:
       tags:
         - Diary
@@ -384,7 +253,6 @@ paths:
           description: 일기 없음
         '500':
           description: 서버 오류
-
   /api/diary/{diary_id}/images/: # GET, POST
     get:
       tags:
@@ -411,7 +279,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
     post:
       tags:
         - Diary Image
@@ -445,7 +312,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/diary/{diary_id}/images/{diary_image_id}/: # DELETE
     delete:
       tags:
@@ -478,7 +344,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/diary/calendar/: # GET
     get:
       tags:
@@ -510,7 +375,6 @@ paths:
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/diary/{diary_id}/comments/:
     get:
       tags:
@@ -537,7 +401,6 @@ paths:
           description: 일기 없음
         '500':
           description: 서버 오류
-
     post:
       tags:
         - Diary Comments
@@ -567,7 +430,6 @@ paths:
           description: 일기 없음
         '500':
           description: 서버 오류
-
   /api/diary/{diary_id}/comments/{comment_id}/:
     patch:
       tags:
@@ -603,7 +465,6 @@ paths:
           description: 댓글 없음
         '500':
           description: 서버 오류
-
     delete:
       tags:
         - Diary Comments
@@ -635,7 +496,6 @@ paths:
           description: 댓글 없음
         '500':
           description: 서버 오류
-
   # 좋아요(Like) API
   /api/diary/{diary_id}/like/:
     post:
@@ -661,7 +521,6 @@ paths:
           description: 일기 없음
         '500':
           description: 서버 오류
-
     delete:
       tags:
         - Diary Like
@@ -688,7 +547,208 @@ paths:
           description: 좋아요 없음
         '500':
           description: 서버 오류
-
+  /api/frienddiary/{friend_id}/calendar/:
+    get:
+      summary: 친구의 다이어리 캘린더 조회
+      tags:
+        - FriendDiary
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+      responses:
+        '200':
+          description: 날짜별 다이어리 개요 리스트 반환
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarDiary'
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+  /api/frienddiary/{friend_id}/date/{date}/:
+    get:
+      summary: 친구의 특정 날짜 다이어리 목록 조회
+      tags:
+        - FriendDiary
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+          description: '조회할 날짜 (YYYY-MM-DD)'
+      responses:
+        '200':
+          description: 해당 날짜의 다이어리 리스트 반환
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiaryList'
+        '400':
+          description: 잘못된 날짜 형식
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+  /api/frienddiary/{friend_id}/diary/{diary_id}/:
+    get:
+      summary: 친구 다이어리 상세 조회
+      tags:
+        - FriendDiary
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+      responses:
+        '200':
+          description: 다이어리 상세 정보 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiaryDetail'
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+        '404':
+          description: 다이어리 없음
+  /api/frienddiary/{friend_id}/diary/{diary_id}/comments/:
+    post:
+      summary: 친구 다이어리에 댓글 작성
+      tags:
+        - FriendDiaryComment
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+      requestBody:
+        description: 댓글 내용
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: 댓글 작성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: 잘못된 요청
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+  /api/frienddiary/{friend_id}/diary/{diary_id}/comments/{comment_id}/:
+    patch:
+      summary: 댓글 수정
+      tags:
+        - FriendDiaryComment
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+        - $ref: '#/components/parameters/comment_id'
+      requestBody:
+        description: 수정할 댓글 내용
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '200':
+          description: 댓글 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: 잘못된 요청
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+    delete:
+      summary: 댓글 삭제
+      tags:
+        - FriendDiaryComment
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+        - $ref: '#/components/parameters/comment_id'
+      responses:
+        '204':
+          description: 댓글 삭제 성공 (내용 없음)
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+  /api/frienddiary/{friend_id}/diary/{diary_id}/like/:
+    post:
+      summary: 다이어리 좋아요 추가
+      tags:
+        - FriendDiaryLike
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+      responses:
+        '201':
+          description: 좋아요 추가 성공
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+    delete:
+      summary: 다이어리 좋아요 취소
+      tags:
+        - FriendDiaryLike
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+      responses:
+        '204':
+          description: 좋아요 취소 성공
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+  /api/frienddiary/{friend_id}/diary/{diary_id}/comments/{comment_id}/like/:
+    post:
+      summary: 댓글 좋아요 추가
+      tags:
+        - FriendDiaryCommentLike
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+        - $ref: '#/components/parameters/comment_id'
+      responses:
+        '201':
+          description: 댓글 좋아요 추가 성공
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
+    delete:
+      summary: 댓글 좋아요 취소
+      tags:
+        - FriendDiaryCommentLike
+      parameters:
+        - $ref: '#/components/parameters/friend_id'
+        - $ref: '#/components/parameters/diary_id'
+        - $ref: '#/components/parameters/comment_id'
+      responses:
+        '204':
+          description: 댓글 좋아요 취소 성공
+        '401':
+          description: 인증 필요
+        '403':
+          description: 친구 관계가 아님
   # 친구초대(Friends, Qr) API
   /api/friends/invite/:
     post:
@@ -714,7 +774,6 @@ paths:
           description: 유저 없음
         '500':
           description: 서버 오류
-
   /api/friends/{friend_id}/accept/:
     post:
       tags:
@@ -739,7 +798,6 @@ paths:
           description: 친구 요청 없음
         '500':
           description: 서버 오류
-
   /api/friends/{friend_id}/reject/:
     post:
       tags:
@@ -767,7 +825,57 @@ paths:
           description: 친구 요청 없음
         '500':
           description: 서버 오류
-
+  /api/friends/:
+    get:
+      summary: 친구 목록 조회
+      tags:
+        - Friends
+      parameters:
+        - name: status
+          in: query
+          description: |
+            조회할 친구 관계 상태
+            (pending: 요청 대기, accepted: 친구, rejected: 거절됨)
+          schema:
+            type: string
+            enum: [pending, accepted, rejected]
+            default: accepted
+      responses:
+        '200':
+          description: 친구 목록 반환
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendResponse'
+        '400':
+          description: 잘못된 status 파라미터
+        '401':
+          description: 인증 필요
+        '500':
+          description: 서버 오류
+  /api/friends/{friend_id}/:
+    delete:
+      summary: 친구 삭제
+      tags:
+        - Friends
+      parameters:
+        - name: friend_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 삭제할 친구의 사용자 ID
+      responses:
+        '204':
+          description: 친구 삭제 성공
+        '401':
+          description: 인증 필요
+        '404':
+          description: 삭제할 친구 관계가 없습니다.
+        '500':
+          description: 서버 오류
   /api/emotions/:
     get:
       summary: 감정 목록 조회
@@ -780,14 +888,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmotionListResponse'
-
         '400':
           description: 잘못된 요청
         '404':
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/emotion/trend/:
     get:
       summary: 감정 변화 그래프
@@ -815,14 +921,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmotionTrendResponse'
-
         '400':
           description: 잘못된 요청
         '404':
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/emotion/count/:
     get:
       summary: 감정별 사용량 그래프
@@ -850,14 +954,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmotionCountResponse'
-
         '400':
           description: 잘못된 요청
         '404':
           description: 리소스 없음
         '500':
           description: 서버 오류
-
   /api/notifications/:
     get:
       summary: 알림 조회
@@ -870,14 +972,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationListResponse'
-
         '400':
           description: 잘못된 요청
         '404':
           description: 리소스 없음
         '500':
           description: 서버 오류
-
     post:
         summary: 알림 생성
         tags:
@@ -899,7 +999,6 @@ paths:
             description: 잘못된 요청
           '500':
             description: 서버 오류
-
   /api/notifications/{notification_id}/:
     patch:
       summary: 알림 수정
@@ -930,7 +1029,6 @@ paths:
           description: 알림 없음
         '500':
           description: 서버 오류
-
     delete:
       summary: 알림 삭제
       tags:
@@ -950,9 +1048,34 @@ paths:
           description: 알림 없음
         '500':
           description: 서버 오류
-
-
 components:
+  securitySchemes:
+   bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    friend_id:
+      name: friend_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 친구 사용자 ID
+    diary_id:
+      name: diary_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 다이어리 ID
+    comment_id:
+      name: comment_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 댓글 ID
   schemas:
     DiaryCreateRequest:
       type: object
@@ -975,7 +1098,6 @@ components:
         - content
         - visibility
         - created_at
-
     DiaryUpdateRequest:
       type: object
       properties:
@@ -986,7 +1108,6 @@ components:
         update_at:
           type: string
           format: date-time
-
     DiaryResponse:
       type: object
       properties:
@@ -1007,7 +1128,6 @@ components:
         like_count:
           type: integer
           description: "일기에 대한 총 좋아요 수"
-
     DiaryDetailResponse:
       type: object
       properties:
@@ -1038,19 +1158,82 @@ components:
         like_count:
           type: integer
           description: "일기에 대한 총 좋아요 수"
-
     UserResponse:
       type: object
       properties:
-        user_id:
+        id:
           type: integer
         username:
           type: string
         nickname:
           type: string
-        profile_image:
+          nullable: true
+        birthday:
           type: string
-
+          format: date
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone_num:
+          type: string
+          nullable: true
+        profile:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - username
+        - created_at
+    UserUpdateRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+        birthday:
+          type: string
+          format: date
+        email:
+          type: string
+          format: email
+        phone_num:
+          type: string
+        profile:
+          type: string
+          format: binary
+      # 모든 필드를 선택적으로 전송 가능
+    OAuthLoginRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          description: OAuth 인증 코드
+        redirect_uri:
+          type: string
+          description: OAuth 리디렉션 URI
+      required:
+        - code
+        - redirect_uri
+    OAuthLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: 액세스 토큰 (JWT)
+        refresh_token:
+          type: string
+          description: 리프레시 토큰
+        user:
+          $ref: '#/components/schemas/UserResponse'
+      required:
+        - token
+        - refresh_token
+        - user
     DiaryImageResponse:
       type: object
       properties:
@@ -1058,7 +1241,6 @@ components:
           type: integer
         image_url:
           type: string
-
     CommentResponse:
       type: object
       properties:
@@ -1074,7 +1256,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     LikeResponse:
       type: object
       properties:
@@ -1090,7 +1271,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     CalendarResponse:
       type: object
       properties:
@@ -1101,7 +1281,6 @@ components:
           type: integer
         diary_id:
           type: integer
-
     CommentCreateRequest:
       type: object
       properties:
@@ -1109,13 +1288,11 @@ components:
           type: string
       required:
         - content
-
     CommentUpdateRequest:
       type: object
       properties:
         content:
           type: string
-
     FriendInviteRequest:
       type: object
       properties:
@@ -1128,7 +1305,6 @@ components:
       required:
         - invite_type
         - invite_code
-
     FriendInviteResponse:
       type: object
       properties:
@@ -1139,26 +1315,36 @@ components:
         invited_at:
           type: string
           format: date-time
-
     FriendResponse:
       type: object
       properties:
-        friend_id:
+        id:
           type: integer
-        user_id:
-          type: integer
-        friend_user_id:
-          type: integer
-        is_friend:
-          type: boolean
-          description: "true=친구, false=친구 아님"
-        created_at:
+          description: '사용자 ID'
+        nickname:
           type: string
-          format: date-time
-        responded_at:
+          description: '친구의 닉네임'
+        profile:
           type: string
-          format: date-time
-
+          format: uri
+          description: '친구 프로필 이미지 URL'
+      required:
+        - id
+        - nickname
+        - profile
+    FriendListResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        nickname:
+          type: string
+          example: 감자짱
+        profile:
+          type: string
+          format: uri
+          example: https://example.com/profile.jpg
     EmotionListResponse:
       type: array
       items:
@@ -1166,7 +1352,6 @@ components:
         properties:
           emotion:
             $ref: '#/components/schemas/EmotionResponse'
-
     EmotionTrendResponse:
       type: object
       properties:
@@ -1180,7 +1365,6 @@ components:
           type: array
           items:
             type: integer
-
     EmotionCountResponse:
       type: array
       items:
@@ -1190,15 +1374,12 @@ components:
             $ref: '#/components/schemas/EmotionResponse'
           count:
             type: integer
-
-
     NotificationListResponse:
       type: array
       items:
         properties:
           notification:
             $ref: '#/components/schemas/NotificationResponse'
-
     EmotionResponse:
       type: object
       properties:
@@ -1208,7 +1389,6 @@ components:
           type: string
         emotion:
           type: string
-
     NotificationResponse:
       type: object
       properties:
@@ -1222,7 +1402,6 @@ components:
           type: string
         created_at:
           type: string
-
     NotificationCreateRequest:
       type: object
       properties:
@@ -1233,7 +1412,6 @@ components:
       required:
         - notificationtype
         - notificationmessage
-
     NotificationUpdateRequest:
       type: object
       properties:
@@ -1241,125 +1419,97 @@ components:
           type: string
         notificationmessage:
           type: string
-
-    UserUpdateRequest:
+    CalendarDiary:
       type: object
       properties:
-        nickname:
+        date:
           type: string
-        profile_image:
+          format: date
+        emotion_id:
+          type: integer
+          nullable: true
+        emoji:
           type: string
-
-    DiaryFriend:
+          nullable: true
+        diary_id:
+          type: integer
+      required:
+        - date
+        - diary_id
+    DiaryList:
       type: object
       properties:
         id:
           type: integer
-          example: 1
         user:
-          type: integer
-          example: 2
-        friend_user_id:
-          type: integer
-          example: 1
-        status:
+          type: object
+        content:
           type: string
-          enum: [ pending, accepted, rejected ]
-          example: accepted
-        requested_at:
+        created_at:
           type: string
           format: date-time
-          example: "2024-05-16T12:34:56Z"
-        responded_at:
+        updated_at:
           type: string
           format: date-time
-          example: "2024-05-16T12:34:56Z"
-
-      Error:
-        type: object
-        properties:
-          message:
-            type: string
-            example: "Error message description"
-        required:
-          - message
-
-      securitySchemes:
-        BearerAuth:
-          type: http
-          scheme: bearer
-          bearerFormat: JWT
-          description: Enter JWT token in format "Bearer {token}"
-
-      responses:
-        InvalidInviteCode:
-          description: Invalid invite code
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                invalidCode:
-                  value:
-                    message: "유효하지 않은 초대코드입니다."
-
-    Error:
+        emotion:
+          type: object
+          nullable: true
+        like_count:
+          type: integer
+    DiaryDetail:
       type: object
       properties:
-        message:
+        id:
+          type: integer
+        user:
+          type: object
+        content:
           type: string
-          example: "Error message description"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        emotion:
+          type: object
+          nullable: true
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              image_url:
+                type: string
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        like_count:
+          type: integer
+    CommentCreate:
+      type: object
+      properties:
+        content:
+          type: string
       required:
-        - message
-
-      securitySchemes:
-        BearerAuth:
-          type: http
-          scheme: bearer
-          bearerFormat: JWT
-          description: Enter JWT token in format "Bearer {token}"
-
-      responses:
-        InvalidInviteCode:
-          description: Invalid invite code
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                invalidCode:
-                  value:
-                    message: "유효하지 않은 초대코드입니다."
-
-        SelfInvite:
-          description: Self invitation attempt
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                selfInvite:
-                  value:
-                    message: "자기 자신에게 친구 요청은 불가합니다."
-
-        AlreadyRequested:
-          description: Duplicate friend request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                duplicateRequest:
-                  value:
-                    message: "이미 친구 요청을 보냈습니다."
-
-        AlreadyFriends:
-          description: Already friends
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                alreadyFriends:
-                  value:
-                    message: "이미 친구입니다."
+        - content
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: object
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        like_count:
+          type: integer
