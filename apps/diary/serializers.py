@@ -101,7 +101,7 @@ class CalendarDiarySerializer(serializers.Serializer):
 
     def get_image_url(self, obj):
         try:
-            diary = Diary.objects.get(id=obj['diary_id'])
+            diary = Diary.objects.get(id=obj["diary_id"])
             first_image = diary.images.filter(is_deleted=False).first()
             return first_image.image.url if first_image else None
         except Diary.DoesNotExist:

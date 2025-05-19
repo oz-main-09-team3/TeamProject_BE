@@ -15,6 +15,7 @@ import random
 from datetime import timedelta
 from pathlib import Path
 
+import sentry_sdk
 from dotenv import load_dotenv
 
 from .logging import DEFAULT_LOGGING
@@ -247,3 +248,12 @@ AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_CLOUDFRONT_DOMAIN")
 STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+)
