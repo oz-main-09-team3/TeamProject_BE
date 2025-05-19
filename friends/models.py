@@ -24,4 +24,4 @@ class DiaryFriend(models.Model):
 
     # 예) user123 -> user456 (pending)
     def __str__(self):
-        return f"{self.user} -> {self.friend_user_id} ({self.status})"
+        return f"{self.user} -> {self.friend_user} ({self.status})"
