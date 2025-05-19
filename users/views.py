@@ -1,6 +1,10 @@
 import requests
 from django.core.files.base import ContentFile
 from rest_framework import permissions, status
+from rest_framework.parsers import (
+    FormParser,
+    MultiPartParser,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -12,6 +16,7 @@ from .serializers import (
     OAuthLoginSerializer,
     UserMeSerializer,
     UserSerializer,
+    UserUpdateSerializer,
 )
 
 
@@ -106,16 +111,21 @@ class UserMeAPIView(APIView):
     def get(self, request):
         return Response(UserMeSerializer(request.user).data)
 
+    def delete(self, request):
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserUpdateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # 파일 업로드 파싱
+
     def patch(self, request):
-        serializer = UserMeSerializer(request.user, data=request.data, partial=True)
+        serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(UserMeSerializer(request.user).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request):
-        request.user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LogoutAPIView(APIView):
