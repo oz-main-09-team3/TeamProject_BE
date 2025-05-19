@@ -10,6 +10,7 @@ class CalendarDiarySerializer(serializers.Serializer):
     emotion_id = serializers.IntegerField(allow_null=True)
     emoji = serializers.CharField(allow_null=True)
     diary_id = serializers.IntegerField()
+    content = serializers.CharField(allow_null=True)
 
 
 class DiaryListSerializer(serializers.ModelSerializer):

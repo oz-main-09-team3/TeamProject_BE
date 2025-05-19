@@ -10,6 +10,7 @@ from apps.diary.apis import delete_diary_like as orig_delete_diary_like
 from apps.diary.apis import get_calendar_diary_overview as diary_get_calendar
 from apps.diary.apis import get_diary_by_date as diary_get_by_date
 from apps.diary.apis import update_comment as orig_update_comment
+from apps.diary.models import Diary
 from friends.models import DiaryFriend
 
 
@@ -26,8 +27,28 @@ def _check_friend_or_403(user, friend_id: int):
 
 
 def get_friend_calendar_overview(user, friend_id, year, month):
+    # 1) 권한 체크
     _check_friend_or_403(user, friend_id)
-    return diary_get_calendar(friend_id, year, month)
+
+    # 2) 기존 달력용 데이터 가져오기 (date, emotion_id, emoji, diary_id)
+    raw = diary_get_calendar(friend_id, year, month)
+
+    # 3) diary_id로 Diary 객체를 조회해 content를 추가
+    for day in raw:
+        diary_id = day.get("diary_id")
+        if diary_id is None:
+            day["content"] = None
+            continue
+
+        try:
+            # is_deleted 필드가 있을 경우 필터에 추가
+            diary = Diary.objects.get(id=diary_id, is_deleted=False)
+            day["content"] = diary.content
+        except Diary.DoesNotExist:
+            day["content"] = None
+
+    # 4) 수정된 리스트 반환
+    return raw
 
 
 def get_friend_diaries_by_date(user, friend_id, date_str):
