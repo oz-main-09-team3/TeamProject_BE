@@ -17,6 +17,11 @@ class DiaryListSerializer(serializers.ModelSerializer):
     emotion = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
 
+    def get_emotion(self, obj):
+        if hasattr(obj, "emotion") and obj.emotion:
+            return EmotionSerializer(obj.emotion.emotion).data
+        return None
+
     class Meta:
         model = Diary
         fields = [
@@ -25,8 +30,8 @@ class DiaryListSerializer(serializers.ModelSerializer):
             "content",
             "created_at",
             "updated_at",
+            "visibility",
             "emotion",
-            "like_count",
         ]
 
     def get_emotion(self, obj):
