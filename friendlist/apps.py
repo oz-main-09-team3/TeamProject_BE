@@ -2,5 +2,7 @@ from django.apps import AppConfig
 
 
 class FriendlistConfig(AppConfig):
-    default_auto_field = "django.db.models.BigAutoField"
     name = "friendlist"
+
+    def ready(self):
+        import friendlist.signals

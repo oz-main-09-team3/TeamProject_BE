@@ -12,7 +12,7 @@ class DiaryFriend(models.Model):
     # 친구 요청자
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="send_friend")
     # 친구 수락자
-    friend_user_id = models.ForeignKey(
+    friend_user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="receive_friend"
     )
     # 'pending', 'accepted', 'rejected' 중 하나
@@ -24,4 +24,4 @@ class DiaryFriend(models.Model):
 
     # 예) user123 -> user456 (pending)
     def __str__(self):
-        return f"{self.user} -> {self.friend_user_id} ({self.status})"
+        return f"{self.user} -> {self.friend_user} ({self.status})"
