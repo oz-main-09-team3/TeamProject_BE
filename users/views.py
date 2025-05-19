@@ -3,6 +3,7 @@ from django.core.files.base import ContentFile
 from rest_framework import permissions, status
 from rest_framework.parsers import (
     FormParser,
+    JSONParser,
     MultiPartParser,
 )
 from rest_framework.response import Response
@@ -118,7 +119,7 @@ class UserMeAPIView(APIView):
 
 class UserUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # 파일 업로드 파싱
+    parser_classes = [JSONParser, MultiPartParser, FormParser]  # 파일 업로드 파싱
 
     def patch(self, request):
         serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
