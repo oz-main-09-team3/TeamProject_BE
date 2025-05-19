@@ -18,7 +18,7 @@ def invite_friend(user, friend_user_id):
     except User.DoesNotExist:
         return None, "존재하지 않는 유저입니다."
     diary_friend = DiaryFriend.objects.create(
-        user=user, friend_user_id=friend_user, status="pending"
+        user=user, friend_user=friend_user, status="pending"
     )
     return diary_friend, None
 
