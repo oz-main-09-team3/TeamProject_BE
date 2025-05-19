@@ -216,29 +216,46 @@ REST_FRAMEWORK = {
 
 SITE_ID = 1
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "location": "media",
-            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
-            "region_name": os.getenv("AWS_S3_REGION_NAME"),
-            "default_acl": "bucket-owner-full-control",
-            "querystring_auth": False,
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "location": "static",
-            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
-            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
-        },
-    },
-}
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+#         "OPTIONS": {
+#             "location": "media",
+#             "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+#             "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+#             "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+#             "region_name": os.getenv("AWS_S3_REGION_NAME"),
+#             "default_acl": "bucket-owner-full-control",
+#             "querystring_auth": False,
+#         },
+#     },
+#     "staticfiles": {
+#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+#         "OPTIONS": {
+#             "location": "static",
+#             "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+#             "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+#             "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+#         },
+#     },
+# }
+#
+# AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+# AWS_S3_CUSTOM_DOMAIN = f"{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.amazonaws.com"
+# STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+# STATICFILES_STORAGE = "config.storages.StaticStorage"
+# DEFAULT_FILE_STORAGE = "config.storages.MediaStorage"
 
-AWS_S3_CUSTOM_DOMAIN = f"{os.getenv("AWS_STORAGE_BUCKET_NAME")}.s3.amazonaws.com"
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+# 🔁 정적/미디어 파일 S3 저장소 지정
 STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+
+STATICFILES_STORAGE = "config.storages.StaticStorage"
+DEFAULT_FILE_STORAGE = "config.storages.MediaStorage"
