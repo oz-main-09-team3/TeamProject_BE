@@ -51,10 +51,20 @@ def get_friend_calendar_overview(user, friend_id, year, month):
     return raw
 
 
-def get_friend_diaries_by_date(user, friend_id, date_str):
-    _check_friend_or_403(user, friend_id)
-    # diary_get_by_date는 (queryset, error_msg) 튜플 반환
-    return diary_get_by_date(friend_id, date_str)
+def get_friend_diaries_over_month(user, friend_id, year=None, month=None):
+    """
+    현재 연·월(또는 전체) 일기 리스트를 반환합니다.
+    """
+    if not _check_friend_or_403(user, friend_id):
+        raise PermissionDenied("친구 관계가 아닙니다.")
+
+    qs = Diary.objects.filter(user_id=friend_id, is_deleted=False)
+    if year:
+        qs = qs.filter(created_at__year=year)
+    if month:
+        qs = qs.filter(created_at__month=month)
+
+    return qs.order_by("-created_at")
 
 
 def create_friend_comment(user, friend_id, diary_id, content):

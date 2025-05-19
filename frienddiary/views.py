@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db.models import Q
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,11 +10,6 @@ from rest_framework.views import APIView
 from apps.diary.models import (
     Diary,
     DiaryEmotion,
-)
-from apps.diary.serializers import (
-    CalendarDiarySerializer,
-    DiaryDetailSerializer,
-    DiarySerializer,
 )
 from emotion.serializers import EmotionSerializer
 from frienddiary.apis import (
@@ -24,8 +20,13 @@ from frienddiary.apis import (
     delete_friend_comment_like,
     delete_friend_diary_like,
     get_friend_calendar_overview,
-    get_friend_diaries_by_date,
+    get_friend_diaries_over_month,
     update_friend_comment,
+)
+from frienddiary.serializers import (
+    CalendarDiarySerializer,
+    DiaryDetailSerializer,
+    DiaryListSerializer,
 )
 from friends.models import DiaryFriend
 
@@ -60,28 +61,29 @@ class FriendDiaryCalendarView(APIView):
         return Response(serializer.data)
 
 
-class FriendDiaryByDateView(APIView):
+class FriendDiaryMonthView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, friend_id, date):
-        if not _check_friend_or_terminate(request.user, friend_id):
-            return Response(
-                {"message": "친구 관계가 아닙니다."}, status=status.HTTP_403_FORBIDDEN
+    def get(self, request, friend_id):
+        """
+        GET /api/friends/diaries/{friend_id}/
+        → 현재 연·월의 일기 전체 목록 반환
+        """
+        now = datetime.now()
+        year = now.year
+        month = now.month
+
+        try:
+            diaries = get_friend_diaries_over_month(
+                request.user, friend_id, year=year, month=month
             )
+        except PermissionDenied as e:
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-        diaries, error = get_friend_diaries_by_date(request.user, friend_id, date)
-        if error:
-            return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = DiarySerializer(diaries, many=True, context={"request": request})
-        data = serializer.data
-
-        # 기존 DiaryByDateView 방식대로 emotion 채우기
-        for d in data:
-            emo = DiaryEmotion.objects.filter(diary_id=d["id"]).first()
-            d["emotion"] = EmotionSerializer(emo.emotion).data if emo else None
-
-        return Response(data)
+        serializer = DiaryListSerializer(
+            diaries, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
 
 
 class FriendDiaryDetailView(APIView):

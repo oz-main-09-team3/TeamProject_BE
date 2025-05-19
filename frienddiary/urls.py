@@ -4,9 +4,9 @@ from .views import (
     FriendCommentDetailView,
     FriendCommentLikeView,
     FriendCommentView,
-    FriendDiaryByDateView,
     FriendDiaryCalendarView,
     FriendDiaryDetailView,
+    FriendDiaryMonthView,
     FriendLikeView,
 )
 
@@ -17,9 +17,9 @@ urlpatterns = [
         "<int:friend_id>/calendar/", FriendDiaryCalendarView.as_view(), name="calendar"
     ),
     path(
-        "<int:friend_id>/date/<str:date>/",
-        FriendDiaryByDateView.as_view(),
-        name="by_date",
+        "<int:friend_id>/monthdiary/",
+        FriendDiaryMonthView.as_view(),
+        name="month_diaries",
     ),
     path(
         "<int:friend_id>/diary/<int:diary_id>/",
