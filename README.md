@@ -3,9 +3,10 @@
 <br>
 [![hello](https://myhits.vercel.app/api/hit/https%3A%2F%2Fmyhits.vercel.app?color=blue&label=hello&size=small)](https://myhits.vercel.app)
 ## 프로젝트 URL
-| 구분       | 주소                                                        |
-|----------|-------------------------------------------------------------|
-| 프로젝트 URL | https://handsomepotato.p-e.kr/ |
+| 구분      | 주소                          |
+|---------|-------------------------------|
+| 서비스 URL | https://fancypotato.netlify.app/ |
+| 백엔드 URL | https://handsomepotato.p-e.kr/ |
 _____________________________________________________________________________
 
 <h2 align="center">
