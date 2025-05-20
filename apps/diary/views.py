@@ -161,7 +161,7 @@ class CommentView(APIView):
         return Response(result, status=status_code)
 
     def get(self, request, diary_id):
-        comments = Comment.objects.filter(diary_id=diary_id)
+        comments = Comment.objects.filter(diary_id=diary_id, is_deleted=False)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
