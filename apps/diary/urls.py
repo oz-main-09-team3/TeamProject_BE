@@ -25,7 +25,7 @@ urlpatterns = [
     ),  # 댓글 삭제
     path(
         "<int:diary_id>/comments/<int:comment_id>/", CommentUpdateView.as_view()
-    ),  # PATCH: 댓글 수정
+    ),  # 댓글 수정
     path("<int:diary_id>/like/", LikeView.as_view()),  # 좋아요 추가/삭제
     path("<int:diary_id>/images/", DiaryImageView.as_view()),  # 이미지 업로드/조회
     path(
