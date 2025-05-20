@@ -10,9 +10,8 @@ from apps.diary.apis import delete_diary_like as orig_delete_diary_like
 from apps.diary.apis import get_calendar_diary_overview as diary_get_calendar
 from apps.diary.apis import get_diary_by_date as diary_get_by_date
 from apps.diary.apis import update_comment as orig_update_comment
-from apps.diary.models import Diary
+from apps.diary.models import Comment, Diary
 from friends.models import DiaryFriend
-from apps.diary.models import Comment
 
 
 def _check_friend_or_403(user, friend_id: int):
