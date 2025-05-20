@@ -173,10 +173,6 @@ class CommentDeleteView(APIView):
         result, status_code = delete_comment(request.user, diary_id, comment_id)
         return Response(result, status=status_code)
 
-
-class CommentUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def patch(self, request, diary_id, comment_id):
         content = request.data.get("content")
         result, status_code = update_comment(
