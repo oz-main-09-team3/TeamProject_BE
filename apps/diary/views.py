@@ -29,6 +29,7 @@ from .apis import (
 from .models import Comment, Diary, DiaryEmotion, DiaryImage, Emotion, Like
 from .serializers import (
     CalendarDiarySerializer,
+    CommentSerializer,
     DiaryDetailSerializer,
     DiaryImageSerializer,
     DiarySerializer,
@@ -159,14 +160,18 @@ class CommentView(APIView):
         result, status_code = create_comment(request.user, diary_id, content)
         return Response(result, status=status_code)
 
+    def get(self, request, diary_id):
+        comments = Comment.objects.filter(diary_id=diary_id)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
 
 class CommentDeleteView(APIView):
-    def delete(self, request, diary_id, comment_id):
-        permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-        def delete(self, request, diary_id, comment_id):
-            result, status_code = delete_comment(request.user, diary_id, comment_id)
-            return Response(result, status=status_code)
+    def delete(self, request, diary_id, comment_id):
+        result, status_code = delete_comment(request.user, diary_id, comment_id)
+        return Response(result, status=status_code)
 
 
 class CommentUpdateView(APIView):
