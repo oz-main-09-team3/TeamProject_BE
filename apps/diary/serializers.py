@@ -97,6 +97,15 @@ class CalendarDiarySerializer(serializers.Serializer):
     emotion_id = serializers.IntegerField(allow_null=True)
     emoji = serializers.CharField(allow_null=True)
     diary_id = serializers.IntegerField()
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        try:
+            diary = Diary.objects.get(id=obj["diary_id"])
+            first_image = diary.images.filter(is_deleted=False).first()
+            return first_image.image.url if first_image else None
+        except Diary.DoesNotExist:
+            return None
 
 
 class CommentLikeSerializer(serializers.ModelSerializer):
