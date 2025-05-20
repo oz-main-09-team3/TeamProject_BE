@@ -40,6 +40,8 @@ jobs:
             echo "AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}" >> envs/prod.env
             echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> envs/prod.env
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> envs/prod.env
+            echo "AWS_CLOUDFRONT_DOMAIN=${{ secrets.AWS_CLOUDFRONT_DOMAIN }}" >> envs/prod.env
+            echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> envs/prod.env
             
 
             source ~/.zshrc
