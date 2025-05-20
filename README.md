@@ -1,6 +1,7 @@
 # **HandsomePotato**
-![스크린샷 2025-05-20 14.59.00.png](../../../../var/folders/bv/pb_q5tzs3p9717xlsgwbyv4w0000gn/T/TemporaryItems/NSIRD_screencaptureui_wPoy9I/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-05-20%2014.59.00.png)
+<img width="300" height="300" alt="Image" src="https://github.com/user-attachments/assets/a1cc7226-ac8d-4831-82cc-6761ced7be6d" />
 <br>
+
 [![hello](https://myhits.vercel.app/api/hit/https%3A%2F%2Fmyhits.vercel.app?color=blue&label=hello&size=small)](https://myhits.vercel.app)
 ## 프로젝트 URL
 | 구분       | 주소                                                        |
@@ -66,7 +67,6 @@ _____________________________________________________________________________
 <div align=center> 
     <img src="https://img.shields.io/badge/python-4169e1?style=for-the-badge&logo=python&logoColor=white"> 
     <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white">
-    <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
     <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
     <br>
     <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"> 
