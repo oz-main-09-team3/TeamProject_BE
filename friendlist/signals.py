@@ -10,7 +10,7 @@ from .models import FriendList
 @receiver(post_save, sender=DiaryFriend)
 def sync_friendlist_on_save(sender, instance: DiaryFriend, created, **kwargs):
     user_a = instance.user
-    user_b = User.objects.get(id=instance.friend_user_id.id)
+    user_b = instance.friend_user  # ★ User 인스턴스
 
     if instance.status == "accepted":
         # accepted 상태가 되면 양방향으로 FriendList 생성
@@ -25,7 +25,7 @@ def sync_friendlist_on_save(sender, instance: DiaryFriend, created, **kwargs):
 @receiver(post_delete, sender=DiaryFriend)
 def sync_friendlist_on_delete(sender, instance: DiaryFriend, **kwargs):
     user_a = instance.user
-    user_b = User.objects.get(id=instance.friend_user_id.id)
+    user_b = instance.friend_user  # ★ User 인스턴스
 
     # 요청 자체가 삭제되면 FriendList도 삭제
     FriendList.objects.filter(user=user_a, friend=user_b).delete()
