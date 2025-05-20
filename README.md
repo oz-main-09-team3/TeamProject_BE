@@ -1,7 +1,6 @@
 # **HandsomePotato**
-<img width="300" height="300" alt="Image" src="https://github.com/user-attachments/assets/a1cc7226-ac8d-4831-82cc-6761ced7be6d" />
+![Image](https://github.com/user-attachments/assets/1a59131d-f137-4ff2-9ea5-cf4991ca39ae)
 <br>
-
 [![hello](https://myhits.vercel.app/api/hit/https%3A%2F%2Fmyhits.vercel.app?color=blue&label=hello&size=small)](https://myhits.vercel.app)
 ## 프로젝트 URL
 | 구분       | 주소                                                        |
