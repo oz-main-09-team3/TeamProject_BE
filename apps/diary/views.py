@@ -161,7 +161,7 @@ class CommentView(APIView):
         return Response(result, status=status_code)
 
     def get(self, request, diary_id):
-        comments = Comment.objects.filter(diary_id=diary_id)
+        comments = Comment.objects.filter(diary_id=diary_id, is_deleted=False)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
@@ -172,10 +172,6 @@ class CommentDeleteView(APIView):
     def delete(self, request, diary_id, comment_id):
         result, status_code = delete_comment(request.user, diary_id, comment_id)
         return Response(result, status=status_code)
-
-
-class CommentUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def patch(self, request, diary_id, comment_id):
         content = request.data.get("content")
