@@ -4,16 +4,12 @@ from friends.models import DiaryFriend
 from users.models import User
 
 
-def get_friends_by_status(user: User, status: str) -> list[User]:
-    # 1) 나 → 상대 또는 상대 → 나 방향의 모든 DiaryFriend 레코드를 상태별로 필터
-    queryset = DiaryFriend.objects.filter(
-        Q(user=user, status=status) | Q(friend_user_id=user, status=status)
-    )
-
-    friends: list[User] = []
-    for rel in queryset:
-        if rel.user_id == user.id:
-            friends.append(rel.friend_user_id)
-        else:
-            friends.append(rel.user)
-    return friends
+def get_friends_by_status(user, status):
+    return User.objects.filter(
+        Q(
+            receive_friend__user=user, receive_friend__status=status
+        )  # 내가 받은 요청 중 status에 해당하는 요청의 보낸 사람
+        | Q(
+            send_friend__friend_user=user, send_friend__status=status
+        )  # 내가 보낸 요청 중 status에 해당하는 요청의 받은 사람
+    ).distinct()

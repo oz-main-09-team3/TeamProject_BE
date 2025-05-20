@@ -25,6 +25,7 @@ django-cors-headers = "^4.7.0"
 boto3 = "^1.38.14"
 django-storages = "^1.14.6"
 qrcode = "^8.2"
+sentry-sdk = "^2.29.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
