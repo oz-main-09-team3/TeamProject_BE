@@ -103,6 +103,10 @@ _____________________________________________________________________________
     <img src="https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white">
 </div>
 
+# 팀 소개
+### * 홍승우(팀장): https://github.com/SWWS97
+### * 배현우 : https://github.com/Baehyeonu
+### * 노지민 : https://github.com/nojimin
 <h2>📋 Documents</h2>
 
 ### 1. [테이블 명세서](https://www.notion.so/1d8caf5650aa806abf75fdc5a7f720ed)
