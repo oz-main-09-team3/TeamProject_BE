@@ -10,7 +10,7 @@ from apps.diary.apis import delete_diary_like as orig_delete_diary_like
 from apps.diary.apis import get_calendar_diary_overview as diary_get_calendar
 from apps.diary.apis import get_diary_by_date as diary_get_by_date
 from apps.diary.apis import update_comment as orig_update_comment
-from apps.diary.models import Diary
+from apps.diary.models import Comment, Diary
 from friends.models import DiaryFriend
 
 
@@ -79,7 +79,17 @@ def update_friend_comment(user, friend_id, diary_id, comment_id, content):
 
 def delete_friend_comment(user, friend_id, diary_id, comment_id):
     _check_friend_or_403(user, friend_id)
-    return orig_delete_comment(user, diary_id, comment_id)
+    try:
+        comment = Comment.objects.get(
+            id=comment_id, diary_id=diary_id, is_deleted=False
+        )
+        if comment.user != user:
+            return {"message": "권한이 없습니다"}, 403
+        comment.is_deleted = True
+        comment.save()
+        return {"success": True}, 200
+    except Comment.DoesNotExist:
+        return {"message": "존재하지 않는 댓글입니다"}, 404
 
 
 def create_friend_diary_like(user, friend_id, diary_id):
