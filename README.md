@@ -90,7 +90,8 @@ _____________________________________________________________________________
 </div>
 
 ## **🔱 Architecture**
-![image](https://github.com/user-attachments/assets/ebd7d482-97b5-454d-be5d-1073682e4c90)
+![image](https://github.com/user-attachments/assets/4a8e57eb-c379-4846-9876-015e11a50e50)
+
 <div align=center><h1>📚 STACKS</h1></div>
 
 <div align=center> 
