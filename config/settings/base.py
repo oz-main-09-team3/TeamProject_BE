@@ -47,12 +47,12 @@ AUTH_USER_MODEL = "users.User"
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.staticfiles",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
     "django.contrib.sites",
     # own
     "emotion",
@@ -242,13 +242,40 @@ STORAGES = {
     },
 }
 
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_CLOUDFRONT_DOMAIN")
-STATIC_URL = f"{AWS_S3_CUSTOM_DOMAIN}/static/"
-MEDIA_URL = f"{AWS_S3_CUSTOM_DOMAIN}/media/"
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-SENTRY_DSN = os.getenv("SENTRY_DSN")
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
+if not DEBUG:
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_CLOUDFRONT_DOMAIN")
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    STATIC_URL = "/static/"
+    MEDIA_URL = "/media/"
+
+
+# sentry 설정
+SENTRY_DSN = os.getenv("SENTRY_DSN")
 
 sentry_sdk.init(
     dsn=SENTRY_DSN,
@@ -256,3 +283,8 @@ sentry_sdk.init(
     # of transactions for performance monitoring.
     traces_sample_rate=1.0,
 )
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]

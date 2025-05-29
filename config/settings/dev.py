@@ -11,7 +11,6 @@ load_dotenv(BASE_DIR / "envs" / "dev.env")  # 루트의 dev.env 로드
 DEBUG = True
 ALLOWED_HOSTS = []
 
-
 DATABASES["default"].update(
     {
         "ENGINE": "django.db.backends.postgresql",
@@ -22,3 +21,17 @@ DATABASES["default"].update(
         "PORT": os.getenv("POSTGRES_PORT"),  # dev.env에 있는 DB PORT
     }
 )
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"

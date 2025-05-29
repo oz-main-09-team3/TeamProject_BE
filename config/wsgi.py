@@ -22,6 +22,6 @@ env_path = os.path.join(
 load_dotenv(dotenv_path=env_path)
 
 # DJANGO_SETTINGS_MODULE 자동 설정
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.env")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{env_mode}")
 
 application = get_wsgi_application()

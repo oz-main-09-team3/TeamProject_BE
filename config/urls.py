@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -33,3 +35,14 @@ urlpatterns = [
     path("api/friends/", include("friends.urls")),
     path("api/frienddiary/", include("frienddiary.urls")),
 ]
+
+# 개발 환경에서만 파일 서빙
+if settings.DEBUG:
+    # 미디어 파일 서빙
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # 정적 파일 서빙 (개발용)
+    if hasattr(settings, 'STATICFILES_DIRS') and settings.STATICFILES_DIRS:
+        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    else:
+        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
